@@ -5,12 +5,8 @@ import (
 
 	"github.com/bxcodec/go-clean-arch/models"
 	"github.com/bxcodec/go-clean-arch/repository"
+	"github.com/bxcodec/go-clean-arch/usecase"
 )
-
-type ArticleUsecase interface {
-	Fetch(cursor string, num int64) ([]*models.Article, string, error)
-	// Create(title, content)
-}
 
 type articleUsecase struct {
 	articleRepos repository.ArticleRepository
@@ -35,6 +31,6 @@ func (a *articleUsecase) Fetch(cursor string, num int64) ([]*models.Article, str
 	return listArticle, nextCursor, nil
 }
 
-func NewArticleUsecase(a repository.ArticleRepository) ArticleUsecase {
+func NewArticleUsecase(a repository.ArticleRepository) usecase.ArticleUsecase {
 	return &articleUsecase{a}
 }

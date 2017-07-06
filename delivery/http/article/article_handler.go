@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"strconv"
 
-	articleUcase "github.com/bxcodec/go-clean-arch/usecase/article"
+	articleUcase "github.com/bxcodec/go-clean-arch/usecase"
 	"github.com/labstack/echo"
 )
 

@@ -1,10 +1,12 @@
-hash: 4ee023547759ad0a7c79080ae84516517fa4c053e47ca8960ae4e90c0b8a5373
-updated: 2017-06-06T12:08:35.447297412+07:00
+hash: 5b54e03f3167cc60d023e87fcc2d6209f9cc92c279410e547114777ab98fe030
+updated: 2017-07-06T18:00:44.581514963+07:00
 imports:
 - name: github.com/arielizuardi/envase
   version: 2af3e35f11ee705895d4015aac202a0f9471a542
+- name: github.com/bxcodec/faker
+  version: 7c5fff7ed02e14ac848ef83aee45b95627c96ae2
 - name: github.com/davecgh/go-spew
-  version: 6d212800a42e8ab5c146b8ace3490ee17e5225f9
+  version: 04cdfd42973bb9c8589fd6a731800cf222fde1a9
   subpackages:
   - spew
 - name: github.com/docker/docker
@@ -45,15 +47,13 @@ imports:
   - driver/mysql
   - migrate
 - name: github.com/mattn/go-colorable
-  version: ded68f7a9561c023e790de24279db7ebf473ea80
+  version: 941b50ebc6efddf4c41c8e4537a5f68a4e686b24
 - name: github.com/mattn/go-isatty
   version: fc9e8d8ef48496124e79ae0df75490096eccf6fe
 - name: github.com/mitchellh/mapstructure
   version: d0303fe809921458f417bcf828397a65db30a7e4
-- name: github.com/pelletier/go-buffruneio
-  version: c37440a7cf42ac63b919c752ca73a85067e05992
 - name: github.com/pelletier/go-toml
-  version: 5c26a6ff6fd178719e15decac1c8196da0d7d6d1
+  version: 69d355db5304c0f7f809a2edc054553e7142f016
 - name: github.com/pmezard/go-difflib
   version: d8ed2627bdf02c080bf22230dbb337003b7aba2d
   subpackages:
@@ -65,11 +65,11 @@ imports:
 - name: github.com/spf13/cast
   version: acbeb36b902d72a7a4c18e8f3241075e7ab763e4
 - name: github.com/spf13/jwalterweatherman
-  version: 8f07c835e5cc1450c082fe3a439cf87b0cbb2d99
+  version: 0efa5202c04663c757d84f90f5219c1250baf94f
 - name: github.com/spf13/pflag
   version: e57e3eeb33f795204c1ca35f56c44f83227c6e66
 - name: github.com/spf13/viper
-  version: 0967fc9aceab2ce9da34061253ac10fb99bba5b2
+  version: c1de95864d73a5465492829d7cb2dd422b19ac96
 - name: github.com/stretchr/objx
   version: cbeaeb16a013161a98496fad62933b1d21786672
 - name: github.com/stretchr/testify
@@ -81,20 +81,24 @@ imports:
   version: e746df99fe4a3986f4d4f79e13c1e0117ce9c2f7
 - name: github.com/valyala/fasttemplate
   version: dcecefd839c4193db0d35b88ec65b4c12d360ab0
+- name: github.com/wawandco/fako
+  version: 68d7f8058e3d3a9b9ecc400b89bc1fa83f9f2ad0
 - name: golang.org/x/crypto
-  version: 6c586e17d90a7d08bbbc4069984180dce3b04117
+  version: d625dfd80595a76324dea1452ceb9cfbcaee8e3e
   subpackages:
   - acme
   - acme/autocert
 - name: golang.org/x/sys
-  version: dbc2be9168a660ef302e04b6ff6406de6f967473
+  version: 6faef541c73732f438fb660a212750a9ba9f9362
   subpackages:
   - unix
 - name: golang.org/x/text
-  version: 19e51611da83d6be54ddafce4a4af510cb3e9ea4
+  version: 2bf8f2a19ec09c670e931282edfe6567f6be21c9
   subpackages:
   - transform
   - unicode/norm
+- name: gopkg.in/DATA-DOG/go-sqlmock.v1
+  version: b983233bc0bbea4dc6e8ec8c8c923d935765ffec
 - name: gopkg.in/yaml.v2
   version: cd8b52f8269e0feb286dfeef29f8fe4d5b397e0b
 testImports: []

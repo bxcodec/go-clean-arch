@@ -30,3 +30,26 @@ func (_m *ArticleRepository) Fetch(cursor string, num int64) ([]*models.Article,
 
 	return r0, r1
 }
+
+// GetByID provides a mock function with given fields: id
+func (_m *ArticleRepository) GetByID(id int64) (*models.Article, error) {
+	ret := _m.Called(id)
+
+	var r0 *models.Article
+	if rf, ok := ret.Get(0).(func(int64) *models.Article); ok {
+		r0 = rf(id)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*models.Article)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(int64) error); ok {
+		r1 = rf(id)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}

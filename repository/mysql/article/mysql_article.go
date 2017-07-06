@@ -47,7 +47,17 @@ func (m *mysqlArticleRepository) Fetch(cursor string, num int64) ([]*models.Arti
 	return m.fetch(query, cursor, num)
 
 }
+func (m *mysqlArticleRepository) GetByID(id int64) (*models.Article, error) {
+	query := `SELECT id,title,content,updated_at, created_at
+  						FROM article WHERE ID = ?`
 
+	list, err := m.fetch(query, id)
+	a := &models.Article{}
+	if len(list) > 0 {
+		a = list[0]
+	}
+	return a, err
+}
 func NewMysqlArticleRepository(Conn *sql.DB) repository.ArticleRepository {
 
 	return &mysqlArticleRepository{Conn}
