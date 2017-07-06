@@ -26,3 +26,15 @@ func (a *ArticleHandler) FetchArticle(c echo.Context) error {
 	c.Response().Header().Set(`X-Cursor`, nextCursor)
 	return c.JSON(http.StatusOK, listAr)
 }
+
+func (a *ArticleHandler) GetByID(c echo.Context) error {
+
+	idP, err := strconv.Atoi(c.Param("id"))
+	id := int64(idP)
+
+	art, err := a.AUsecase.GetByID(id)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	return c.JSON(http.StatusOK, art)
+}

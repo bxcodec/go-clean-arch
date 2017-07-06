@@ -51,3 +51,20 @@ func TestFetchError(t *testing.T) {
 	mockArticleRepo.AssertCalled(t, "Fetch", mock.AnythingOfType("string"), mock.AnythingOfType("int64"))
 
 }
+
+func TestGetByID(t *testing.T) {
+	mockArticleRepo := new(mocks.ArticleRepository)
+	var mockArticle models.Article
+	err := faker.FakeData(&mockArticle)
+	assert.NoError(t, err)
+
+	mockArticleRepo.On("GetByID", mock.AnythingOfType("int64")).Return(&mockArticle, nil)
+	defer mockArticleRepo.AssertCalled(t, "GetByID", mock.AnythingOfType("int64"))
+	u := ucase.NewArticleUsecase(mockArticleRepo)
+
+	a, err := u.GetByID(mockArticle.ID)
+
+	assert.NoError(t, err)
+	assert.NotNil(t, a)
+
+}

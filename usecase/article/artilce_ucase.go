@@ -31,6 +31,11 @@ func (a *articleUsecase) Fetch(cursor string, num int64) ([]*models.Article, str
 	return listArticle, nextCursor, nil
 }
 
+func (a *articleUsecase) GetByID(id int64) (*models.Article, error) {
+
+	return a.articleRepos.GetByID(id)
+}
+
 func NewArticleUsecase(a repository.ArticleRepository) usecase.ArticleUsecase {
 	return &articleUsecase{a}
 }
