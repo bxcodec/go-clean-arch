@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 
-	cfg "github.com/KurioApp/tresco/config"
+	cfg "github.com/bxcodec/go-clean-arch/config/env"
 	httpDeliver "github.com/bxcodec/go-clean-arch/delivery/http"
 	articleRepo "github.com/bxcodec/go-clean-arch/repository/mysql/article"
 	articleUcase "github.com/bxcodec/go-clean-arch/usecase/article"
