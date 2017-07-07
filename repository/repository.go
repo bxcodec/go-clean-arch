@@ -9,6 +9,3 @@ type ArticleRepository interface {
 	Store(a *models.Article) (int64, error)
 	Delete(id int64) (bool, error)
 }
-type CategoryRepository interface {
-	Fetch(articleID int64) ([]*models.Category, error)
-}
