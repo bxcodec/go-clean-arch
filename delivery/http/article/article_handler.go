@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"strconv"
 
-	httpHelper "github.com/bxcodec/go-clean-arch/delivery/http/helper"
+	httpHelper "github.com/bxcodec/go-clean-arch/delivery/helper"
 	"github.com/bxcodec/go-clean-arch/models"
 	articleUcase "github.com/bxcodec/go-clean-arch/usecase"
 	"github.com/labstack/echo"
@@ -58,4 +58,15 @@ func (a *ArticleHandler) Store(c echo.Context) error {
 		return c.JSON(statusCode, err.Error())
 	}
 	return c.JSON(http.StatusCreated, ar)
+}
+func (a *ArticleHandler) Delete(c echo.Context) error {
+	idP, err := strconv.Atoi(c.Param("id"))
+	id := int64(idP)
+
+	_, err = a.AUsecase.Delete(id)
+	statusCode := a.Helper.GetStatusCode(err)
+	if err != nil {
+		return c.JSON(statusCode, err.Error())
+	}
+	return c.NoContent(http.StatusNoContent)
 }

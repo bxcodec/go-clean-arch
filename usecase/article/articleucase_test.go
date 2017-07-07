@@ -92,3 +92,24 @@ func TestStore(t *testing.T) {
 	assert.Equal(t, mockArticle.Title, tempMockArticle.Title)
 
 }
+
+func TestDelete(t *testing.T) {
+	mockArticleRepo := new(mocks.ArticleRepository)
+	var mockArticle models.Article
+	err := faker.FakeData(&mockArticle)
+	assert.NoError(t, err)
+
+	mockArticleRepo.On("GetByID", mock.AnythingOfType("int64")).Return(&mockArticle, models.NewErrorNotFound())
+	defer mockArticleRepo.AssertCalled(t, "GetByID", mock.AnythingOfType("int64"))
+
+	mockArticleRepo.On("Delete", mock.AnythingOfType("int64")).Return(true, nil)
+	defer mockArticleRepo.AssertCalled(t, "Delete", mock.AnythingOfType("int64"))
+
+	u := ucase.NewArticleUsecase(mockArticleRepo)
+
+	a, err := u.Delete(mockArticle.ID)
+
+	assert.NoError(t, err)
+	assert.True(t, a)
+
+}

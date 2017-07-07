@@ -1,8 +1,8 @@
 package http
 
 import (
+	httpHelper "github.com/bxcodec/go-clean-arch/delivery/helper"
 	artHandler "github.com/bxcodec/go-clean-arch/delivery/http/article"
-	httpHelper "github.com/bxcodec/go-clean-arch/delivery/http/helper"
 	artUcase "github.com/bxcodec/go-clean-arch/usecase"
 	"github.com/labstack/echo"
 )
@@ -13,4 +13,5 @@ func Init(e *echo.Echo, au artUcase.ArticleUsecase) {
 	e.GET(`/article`, articleHandler.FetchArticle)
 	e.GET(`/article/:id`, articleHandler.GetByID)
 	e.POST(`/article`, articleHandler.Store)
+	e.DELETE(`/article/:id`, articleHandler.Delete)
 }

@@ -16,7 +16,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/bxcodec/faker"
-	httpHelper "github.com/bxcodec/go-clean-arch/delivery/http/helper"
+	httpHelper "github.com/bxcodec/go-clean-arch/delivery/helper"
 )
 
 func TestFetch(t *testing.T) {
@@ -126,4 +126,32 @@ func TestStore(t *testing.T) {
 
 	assert.Equal(t, http.StatusCreated, rec.Code)
 	mockUCase.AssertCalled(t, "Store", &tempMockArticle)
+}
+
+func TestDelete(t *testing.T) {
+	var mockArticle models.Article
+	err := faker.FakeData(&mockArticle)
+	assert.NoError(t, err)
+
+	mockUCase := new(mocks.ArticleUsecase)
+
+	num := int(mockArticle.ID)
+
+	mockUCase.On("Delete", int64(num)).Return(true, nil)
+
+	e := echo.New()
+	req, err := http.NewRequest(echo.DELETE, "/article/"+strconv.Itoa(int(num)), strings.NewReader(""))
+	assert.NoError(t, err)
+
+	rec := httptest.NewRecorder()
+	c := e.NewContext(req, rec)
+	c.SetPath("article/:id")
+	c.SetParamNames("id")
+	c.SetParamValues(strconv.Itoa(num))
+	handler := articleHttp.ArticleHandler{AUsecase: mockUCase, Helper: httpHelper.HttpHelper{}}
+	handler.Delete(c)
+
+	assert.Equal(t, http.StatusNoContent, rec.Code)
+	mockUCase.AssertCalled(t, "Delete", int64(num))
+
 }

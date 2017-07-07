@@ -56,6 +56,16 @@ func (a *articleUsecase) Store(m *models.Article) (*models.Article, error) {
 	return m, nil
 }
 
+func (a *articleUsecase) Delete(id int64) (bool, error) {
+	existedArticle, _ := a.GetByID(id)
+
+	if existedArticle == nil {
+		return false, models.NewErrorNotFound()
+	}
+
+	return a.articleRepos.Delete(id)
+}
+
 func NewArticleUsecase(a repository.ArticleRepository) usecase.ArticleUsecase {
 	return &articleUsecase{a}
 }

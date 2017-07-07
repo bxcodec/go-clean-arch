@@ -95,3 +95,23 @@ func TestGetByTitle(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, anArticle)
 }
+
+func TestDelete(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	defer db.Close()
+
+	query := "DELETE FROM article WHERE id = \\?"
+
+	prep := mock.ExpectPrepare(query)
+	prep.ExpectExec().WithArgs(12).WillReturnResult(sqlmock.NewResult(12, 1))
+
+	a := articleRepo.NewMysqlArticleRepository(db)
+
+	num := int64(12)
+	anArticleStatus, err := a.Delete(num)
+	assert.NoError(t, err)
+	assert.True(t, anArticleStatus)
+}

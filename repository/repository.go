@@ -7,6 +7,7 @@ type ArticleRepository interface {
 	GetByID(id int64) (*models.Article, error)
 	GetByTitle(title string) (*models.Article, error)
 	Store(a *models.Article) (int64, error)
+	Delete(id int64) (bool, error)
 }
 type CategoryRepository interface {
 	Fetch(articleID int64) ([]*models.Category, error)

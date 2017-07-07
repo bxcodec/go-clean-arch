@@ -107,3 +107,26 @@ func NewMysqlArticleRepository(Conn *sql.DB) repository.ArticleRepository {
 
 	return &mysqlArticleRepository{Conn}
 }
+
+func (m *mysqlArticleRepository) Delete(id int64) (bool, error) {
+	query := "DELETE FROM article WHERE id = ?"
+
+	stmt, err := m.Conn.Prepare(query)
+	if err != nil {
+		return false, models.NewErrorInternalServer()
+	}
+	res, err := stmt.Exec(id)
+	if err != nil {
+
+		return false, models.NewErrorInternalServer()
+	}
+	rowsAfected, err := res.RowsAffected()
+	if err != nil {
+		return false, models.NewErrorInternalServer()
+	}
+	if rowsAfected <= 0 {
+		return false, models.NewErrorInternalServer()
+	}
+
+	return true, nil
+}
