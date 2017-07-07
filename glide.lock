@@ -1,12 +1,10 @@
-hash: 5b54e03f3167cc60d023e87fcc2d6209f9cc92c279410e547114777ab98fe030
-updated: 2017-07-06T18:00:44.581514963+07:00
+hash: 0d7aebc15bc7d7ef7de63cea97ec2e9b03ccea87e396bf4e767c425aeabc6285
+updated: 2017-07-07T18:03:21.852847936+07:00
 imports:
-- name: github.com/arielizuardi/envase
-  version: 2af3e35f11ee705895d4015aac202a0f9471a542
 - name: github.com/bxcodec/faker
   version: 7c5fff7ed02e14ac848ef83aee45b95627c96ae2
 - name: github.com/davecgh/go-spew
-  version: 04cdfd42973bb9c8589fd6a731800cf222fde1a9
+  version: 6d212800a42e8ab5c146b8ace3490ee17e5225f9
   subpackages:
   - spew
 - name: github.com/docker/docker
@@ -28,10 +26,6 @@ imports:
   - json/parser
   - json/scanner
   - json/token
-- name: github.com/KurioApp/tresco
-  version: f9db8681af2b0b7b8fb2e7037eeef16359c61950
-  subpackages:
-  - config
 - name: github.com/labstack/echo
   version: 1049c9613cd371b7ea8f219404c9a821734781ed
 - name: github.com/labstack/gommon
@@ -84,7 +78,7 @@ imports:
 - name: github.com/wawandco/fako
   version: 68d7f8058e3d3a9b9ecc400b89bc1fa83f9f2ad0
 - name: golang.org/x/crypto
-  version: d625dfd80595a76324dea1452ceb9cfbcaee8e3e
+  version: a48ac81e47fd6f9ed1258f3b60ae9e75f93cb7ed
   subpackages:
   - acme
   - acme/autocert
@@ -93,7 +87,7 @@ imports:
   subpackages:
   - unix
 - name: golang.org/x/text
-  version: 2bf8f2a19ec09c670e931282edfe6567f6be21c9
+  version: cfdf022e86b4ecfb646e1efbd7db175dd623a8fa
   subpackages:
   - transform
   - unicode/norm
