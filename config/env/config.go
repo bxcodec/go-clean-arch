@@ -17,7 +17,7 @@ type viperConfig struct {
 }
 
 func (v *viperConfig) Init() {
-	viper.SetEnvPrefix(`tresco`)
+	viper.SetEnvPrefix(`go-clean`)
 	viper.AutomaticEnv()
 
 	replacer := strings.NewReplacer(`.`, `_`)
