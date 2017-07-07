@@ -2,21 +2,7 @@ package models
 
 import "reflect"
 
-func getTypeData(i interface{}) string {
 
-	v := reflect.ValueOf(i)
-	v = reflect.Indirect(v)
-	return v.Type().String()
-}
-
-func isCustomeEror(err error) bool {
-
-	switch getTypeData(err) {
-	case "ErrorInternalServer":
-		return true
-	}
-	return false
-}
 
 type ErrorInternalServer struct {
 	Message string
