@@ -35,6 +35,26 @@ func (a *articleUsecase) GetByID(id int64) (*models.Article, error) {
 
 	return a.articleRepos.GetByID(id)
 }
+func (a *articleUsecase) GetByTitle(title string) (*models.Article, error) {
+
+	return a.articleRepos.GetByTitle(title)
+}
+
+func (a *articleUsecase) Store(m *models.Article) (*models.Article, error) {
+
+	existedArticle, _ := a.GetByTitle(m.Title)
+	if existedArticle != nil {
+		return nil, models.NewErrorConflict()
+	}
+
+	id, err := a.articleRepos.Store(m)
+	if err != nil {
+		return nil, err
+	}
+
+	m.ID = id
+	return m, nil
+}
 
 func NewArticleUsecase(a repository.ArticleRepository) usecase.ArticleUsecase {
 	return &articleUsecase{a}

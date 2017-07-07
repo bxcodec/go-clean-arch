@@ -53,3 +53,47 @@ func (_m *ArticleRepository) GetByID(id int64) (*models.Article, error) {
 
 	return r0, r1
 }
+
+// GetByTitle provides a mock function with given fields: title
+func (_m *ArticleRepository) GetByTitle(title string) (*models.Article, error) {
+	ret := _m.Called(title)
+
+	var r0 *models.Article
+	if rf, ok := ret.Get(0).(func(string) *models.Article); ok {
+		r0 = rf(title)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*models.Article)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(title)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Store provides a mock function with given fields: a
+func (_m *ArticleRepository) Store(a *models.Article) (int64, error) {
+	ret := _m.Called(a)
+
+	var r0 int64
+	if rf, ok := ret.Get(0).(func(*models.Article) int64); ok {
+		r0 = rf(a)
+	} else {
+		r0 = ret.Get(0).(int64)
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(*models.Article) error); ok {
+		r1 = rf(a)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}

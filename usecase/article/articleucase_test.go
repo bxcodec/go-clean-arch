@@ -68,3 +68,27 @@ func TestGetByID(t *testing.T) {
 	assert.NotNil(t, a)
 
 }
+
+func TestStore(t *testing.T) {
+	mockArticleRepo := new(mocks.ArticleRepository)
+	var mockArticle models.Article
+	err := faker.FakeData(&mockArticle)
+	assert.NoError(t, err)
+	//set to 0 because this is test from Client, and ID is an AutoIncreament
+	tempMockArticle := mockArticle
+	tempMockArticle.ID = 0
+
+	mockArticleRepo.On("GetByTitle", mock.AnythingOfType("string")).Return(nil, models.NewErrorNotFound())
+	mockArticleRepo.On("Store", mock.AnythingOfType("*models.Article")).Return(mockArticle.ID, nil)
+	defer mockArticleRepo.AssertCalled(t, "GetByTitle", mock.AnythingOfType("string"))
+	defer mockArticleRepo.AssertCalled(t, "Store", mock.AnythingOfType("*models.Article"))
+
+	u := ucase.NewArticleUsecase(mockArticleRepo)
+
+	a, err := u.Store(&tempMockArticle)
+
+	assert.NoError(t, err)
+	assert.NotNil(t, a)
+	assert.Equal(t, mockArticle.Title, tempMockArticle.Title)
+
+}
