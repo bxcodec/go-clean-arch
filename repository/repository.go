@@ -9,3 +9,11 @@ type ArticleRepository interface {
 	Store(a *models.Article) (int64, error)
 	Delete(id int64) (bool, error)
 }
+
+type CategoryRepository interface {
+	Fetch(cursor string, num int64) ([]*models.Category, error)
+	GetByID(id int64) (*models.Category, error)
+	GetByName(title string) (*models.Category, error)
+	Store(a *models.Category) (int64, error)
+	Delete(id int64) (bool, error)
+}

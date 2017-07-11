@@ -7,7 +7,9 @@ import (
 	cfg "github.com/bxcodec/go-clean-arch/config/env"
 	httpDeliver "github.com/bxcodec/go-clean-arch/delivery/http"
 	articleRepo "github.com/bxcodec/go-clean-arch/repository/mysql/article"
+	categoryRepo "github.com/bxcodec/go-clean-arch/repository/mysql/category"
 	articleUcase "github.com/bxcodec/go-clean-arch/usecase/article"
+	categoryUcase "github.com/bxcodec/go-clean-arch/usecase/category"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/labstack/echo"
 )
@@ -39,7 +41,15 @@ func main() {
 	e := echo.New()
 	ar := articleRepo.NewMysqlArticleRepository(dbConn)
 	au := articleUcase.NewArticleUsecase(ar)
-	httpDeliver.Init(e, au)
+	cr := categoryRepo.NewMysqlCategoryRepository(dbConn)
+	cu := categoryUcase.NewCategoryUsecase(cr)
+
+	httpDeliveryHandler := httpDeliver.HttpHandler{
+		E: e,
+	}
+	httpDeliveryHandler.
+		InitArticleDelivery(au).
+		InitCategoryDelivery(cu)
 
 	e.Start(config.GetString("server.address"))
 }
