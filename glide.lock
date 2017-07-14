@@ -1,5 +1,5 @@
-hash: 0d7aebc15bc7d7ef7de63cea97ec2e9b03ccea87e396bf4e767c425aeabc6285
-updated: 2017-07-07T18:03:21.852847936+07:00
+hash: 760c7773de0abde5d2b4e4e35fbb3906c86312febfaff0d9f6b3956508587009
+updated: 2017-07-14T14:02:06.311058611+07:00
 imports:
 - name: github.com/bxcodec/faker
   version: 7c5fff7ed02e14ac848ef83aee45b95627c96ae2
@@ -7,10 +7,6 @@ imports:
   version: 6d212800a42e8ab5c146b8ace3490ee17e5225f9
   subpackages:
   - spew
-- name: github.com/docker/docker
-  version: 90d35abf7b3535c1c319c872900fbd76374e521c
-  subpackages:
-  - client
 - name: github.com/fsnotify/fsnotify
   version: 4da3e2cfbabc9f751898f250b49f2439785783a1
 - name: github.com/go-sql-driver/mysql
@@ -34,14 +30,9 @@ imports:
   - color
   - log
 - name: github.com/magiconair/properties
-  version: 51463bfca2576e06c62a8504b5c0f06d61312647
-- name: github.com/mattes/migrate
-  version: afc973c4e5a6b746217c2d3950fcd110ed1ba349
-  subpackages:
-  - driver/mysql
-  - migrate
+  version: be5ece7dd465ab0765a9682137865547526d1dfb
 - name: github.com/mattn/go-colorable
-  version: 941b50ebc6efddf4c41c8e4537a5f68a4e686b24
+  version: 165c32261890df3bfb1fb678e8096729abdad5d2
 - name: github.com/mattn/go-isatty
   version: fc9e8d8ef48496124e79ae0df75490096eccf6fe
 - name: github.com/mitchellh/mapstructure
@@ -75,15 +66,13 @@ imports:
   version: e746df99fe4a3986f4d4f79e13c1e0117ce9c2f7
 - name: github.com/valyala/fasttemplate
   version: dcecefd839c4193db0d35b88ec65b4c12d360ab0
-- name: github.com/wawandco/fako
-  version: 68d7f8058e3d3a9b9ecc400b89bc1fa83f9f2ad0
 - name: golang.org/x/crypto
-  version: a48ac81e47fd6f9ed1258f3b60ae9e75f93cb7ed
+  version: 3627ff35f31987174dbee61d9d1dcc1c643e7174
   subpackages:
   - acme
   - acme/autocert
 - name: golang.org/x/sys
-  version: 6faef541c73732f438fb660a212750a9ba9f9362
+  version: abf9c25f54453410d0c6668e519582a9e1115027
   subpackages:
   - unix
 - name: golang.org/x/text
