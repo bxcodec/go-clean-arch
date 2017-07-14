@@ -22,8 +22,14 @@ The explanation about this project's structure  can read from this medium's post
 ### How To Run This Project
 
 ```bash
+#move to directory
+cd $GOPATH/src/github.com/bxcodec
+
 # Clone into YOUR $GOPATH/src
 git clone https://github.com/bxcodec/go-clean-arch.git
+
+#move to project
+cd go-clean-arch
 
 # Install Dependencies
 glide install -v
@@ -35,3 +41,26 @@ make
 go run main.go
 
 ```
+
+Or
+
+```bash
+# GET WITH GO GET
+go get github.com/bxcodec/go-clean-arch
+
+# Go to directory
+
+cd $GOPATH/src/github.com/bxcodec/go-clean-arch
+
+# Install Dependencies
+glide install -v
+
+# Make File
+make
+
+# Run Project
+go run main.go
+```
+
+
+> Make Sure you have run the article.sql in your mysql
