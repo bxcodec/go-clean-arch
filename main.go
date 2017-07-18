@@ -42,6 +42,7 @@ func main() {
 	e := echo.New()
 	middL := middleware.InitMiddleware()
 	e.Use(middL.CORS)
+
 	ar := articleRepo.NewMysqlArticleRepository(dbConn)
 	au := articleUcase.NewArticleUsecase(ar)
 	cr := categoryRepo.NewMysqlCategoryRepository(dbConn)
