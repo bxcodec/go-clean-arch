@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	cfg "github.com/bxcodec/go-clean-arch/config/env"
+	"github.com/bxcodec/go-clean-arch/config/middleware"
 	httpDeliver "github.com/bxcodec/go-clean-arch/delivery/http"
 	articleRepo "github.com/bxcodec/go-clean-arch/repository/mysql/article"
 	categoryRepo "github.com/bxcodec/go-clean-arch/repository/mysql/category"
@@ -39,6 +40,8 @@ func main() {
 	}
 	defer dbConn.Close()
 	e := echo.New()
+	middL := middleware.InitMiddleware()
+	e.Use(middL.CORS)
 	ar := articleRepo.NewMysqlArticleRepository(dbConn)
 	au := articleUcase.NewArticleUsecase(ar)
 	cr := categoryRepo.NewMysqlCategoryRepository(dbConn)
