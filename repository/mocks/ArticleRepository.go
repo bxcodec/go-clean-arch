@@ -118,3 +118,26 @@ func (_m *ArticleRepository) Store(a *models.Article) (int64, error) {
 
 	return r0, r1
 }
+
+// Update provides a mock function with given fields: article
+func (_m *ArticleRepository) Update(article *models.Article) (*models.Article, error) {
+	ret := _m.Called(article)
+
+	var r0 *models.Article
+	if rf, ok := ret.Get(0).(func(*models.Article) *models.Article); ok {
+		r0 = rf(article)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*models.Article)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(*models.Article) error); ok {
+		r1 = rf(article)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}

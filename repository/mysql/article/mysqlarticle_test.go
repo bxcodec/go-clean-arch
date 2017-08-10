@@ -115,3 +115,31 @@ func TestDelete(t *testing.T) {
 	assert.NoError(t, err)
 	assert.True(t, anArticleStatus)
 }
+
+func TestUpdate(t *testing.T) {
+
+	ar := &models.Article{
+		ID:        12,
+		Title:     "Judul",
+		Content:   "Content",
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+	}
+
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	defer db.Close()
+
+	query := "UPDATE article set title=\\?, content=\\?, updated_at=\\? WHERE ID = \\?"
+
+	prep := mock.ExpectPrepare(query)
+	prep.ExpectExec().WithArgs(ar.Title, ar.Content, ar.UpdatedAt, ar.ID).WillReturnResult(sqlmock.NewResult(12, 1))
+
+	a := articleRepo.NewMysqlArticleRepository(db)
+
+	s, err := a.Update(ar)
+	assert.NoError(t, err)
+	assert.NotNil(t, s)
+}

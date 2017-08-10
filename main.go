@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	"net/url"
 
 	cfg "github.com/bxcodec/go-clean-arch/config/env"
 	"github.com/bxcodec/go-clean-arch/config/middleware"
@@ -33,7 +34,11 @@ func main() {
 	dbUser := config.GetString(`database.user`)
 	dbPass := config.GetString(`database.pass`)
 	dbName := config.GetString(`database.name`)
-	dsn := dbUser + `:` + dbPass + `@tcp(` + dbHost + `:` + dbPort + `)/` + dbName + `?parseTime=1&loc=Asia%2FJakarta`
+	connection := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", dbUser, dbPass, dbHost, dbPort, dbName)
+	val := url.Values{}
+	val.Add("parseTime", "1")
+	val.Add("loc", "Asia/Jakarta")
+	dsn := fmt.Sprintf("%s?%s", connection, val.Encode())
 	dbConn, err := sql.Open(`mysql`, dsn)
 	if err != nil && config.GetBool("debug") {
 		fmt.Println(err)

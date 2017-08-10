@@ -103,10 +103,6 @@ func (m *mysqlArticleRepository) Store(a *models.Article) (int64, error) {
 	}
 	return res.LastInsertId()
 }
-func NewMysqlArticleRepository(Conn *sql.DB) repository.ArticleRepository {
-
-	return &mysqlArticleRepository{Conn}
-}
 
 func (m *mysqlArticleRepository) Delete(id int64) (bool, error) {
 	query := "DELETE FROM article WHERE id = ?"
@@ -129,4 +125,30 @@ func (m *mysqlArticleRepository) Delete(id int64) (bool, error) {
 	}
 
 	return true, nil
+}
+func (m *mysqlArticleRepository) Update(ar *models.Article) (*models.Article, error) {
+	query := `UPDATE article set title=?, content=?, updated_at=? WHERE ID = ?`
+
+	stmt, err := m.Conn.Prepare(query)
+	if err != nil {
+		return nil, nil
+	}
+	res, err := stmt.Exec(ar.Title, ar.Content, ar.UpdatedAt, ar.ID)
+	if err != nil {
+		return nil, err
+	}
+	affect, err := res.RowsAffected()
+	if err != nil {
+		return nil, err
+	}
+	if affect < 1 {
+		return nil, models.NewErrorInternalServer()
+	}
+
+	return ar, nil
+}
+
+func NewMysqlArticleRepository(Conn *sql.DB) repository.ArticleRepository {
+
+	return &mysqlArticleRepository{Conn}
 }
