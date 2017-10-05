@@ -6,9 +6,9 @@ import (
 	"testing"
 
 	"github.com/bxcodec/faker"
-	"github.com/bxcodec/go-clean-arch/models"
-	"github.com/bxcodec/go-clean-arch/repository/mocks"
-	ucase "github.com/bxcodec/go-clean-arch/usecase/article"
+	models "github.com/bxcodec/go-clean-arch/article"
+	"github.com/bxcodec/go-clean-arch/article/repository/mocks"
+	ucase "github.com/bxcodec/go-clean-arch/article/usecase"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -78,10 +78,10 @@ func TestStore(t *testing.T) {
 	tempMockArticle := mockArticle
 	tempMockArticle.ID = 0
 
-	mockArticleRepo.On("GetByTitle", mock.AnythingOfType("string")).Return(nil, models.NewErrorNotFound())
-	mockArticleRepo.On("Store", mock.AnythingOfType("*models.Article")).Return(mockArticle.ID, nil)
+	mockArticleRepo.On("GetByTitle", mock.AnythingOfType("string")).Return(nil, models.NOT_FOUND_ERROR)
+	mockArticleRepo.On("Store", mock.AnythingOfType("*article.Article")).Return(mockArticle.ID, nil)
 	defer mockArticleRepo.AssertCalled(t, "GetByTitle", mock.AnythingOfType("string"))
-	defer mockArticleRepo.AssertCalled(t, "Store", mock.AnythingOfType("*models.Article"))
+	defer mockArticleRepo.AssertCalled(t, "Store", mock.AnythingOfType("*article.Article"))
 
 	u := ucase.NewArticleUsecase(mockArticleRepo)
 
@@ -99,7 +99,7 @@ func TestDelete(t *testing.T) {
 	err := faker.FakeData(&mockArticle)
 	assert.NoError(t, err)
 
-	mockArticleRepo.On("GetByID", mock.AnythingOfType("int64")).Return(&mockArticle, models.NewErrorNotFound())
+	mockArticleRepo.On("GetByID", mock.AnythingOfType("int64")).Return(&mockArticle, models.NOT_FOUND_ERROR)
 	defer mockArticleRepo.AssertCalled(t, "GetByID", mock.AnythingOfType("int64"))
 
 	mockArticleRepo.On("Delete", mock.AnythingOfType("int64")).Return(true, nil)

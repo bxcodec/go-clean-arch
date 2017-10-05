@@ -1,11 +1,11 @@
-package article_test
+package mysql_test
 
 import (
 	"testing"
 	"time"
 
-	"github.com/bxcodec/go-clean-arch/models"
-	articleRepo "github.com/bxcodec/go-clean-arch/repository/mysql/article"
+	models "github.com/bxcodec/go-clean-arch/article"
+	articleRepo "github.com/bxcodec/go-clean-arch/article/repository/mysql"
 	"github.com/stretchr/testify/assert"
 	sqlmock "gopkg.in/DATA-DOG/go-sqlmock.v1"
 )
@@ -68,7 +68,7 @@ func TestStore(t *testing.T) {
 	query := "INSERT  article SET title=\\? , content=\\? , updated_at=\\? , created_at=\\?"
 	prep := mock.ExpectPrepare(query)
 	prep.ExpectExec().WithArgs(ar.Title, ar.Content, ar.CreatedAt, ar.UpdatedAt).WillReturnResult(sqlmock.NewResult(12, 1))
-	// mock.ExpectExec(query).WithArgs(ar.Title, ar.Content, ar.CreatedAt, ar.UpdatedAt).WillReturnResult(sqlmock.NewResult(12, 1))
+
 	a := articleRepo.NewMysqlArticleRepository(db)
 
 	lastId, err := a.Store(ar)

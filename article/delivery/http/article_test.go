@@ -9,14 +9,14 @@ import (
 	"testing"
 	"time"
 
-	articleHttp "github.com/bxcodec/go-clean-arch/delivery/http/article"
-	"github.com/bxcodec/go-clean-arch/models"
-	"github.com/bxcodec/go-clean-arch/usecase/mocks"
+	models "github.com/bxcodec/go-clean-arch/article"
+	articleHttp "github.com/bxcodec/go-clean-arch/article/delivery/http"
+	"github.com/bxcodec/go-clean-arch/article/usecase/mocks"
 	"github.com/labstack/echo"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 
 	"github.com/bxcodec/faker"
-	httpHelper "github.com/bxcodec/go-clean-arch/delivery/helper"
 )
 
 func TestFetch(t *testing.T) {
@@ -36,21 +36,23 @@ func TestFetch(t *testing.T) {
 
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
-	handler := articleHttp.ArticleHandler{AUsecase: mockUCase, Helper: httpHelper.HttpHelper{}}
+	handler := articleHttp.HttpArticleHandler{
+		AUsecase: mockUCase,
+	}
 	handler.FetchArticle(c)
 
 	responseCursor := rec.Header().Get("X-Cursor")
 	assert.Equal(t, "10", responseCursor)
 
 	assert.Equal(t, http.StatusOK, rec.Code)
-	mockUCase.AssertCalled(t, "Fetch", cursor, int64(num))
+	mockUCase.AssertExpectations(t)
 }
 
 func TestFetchError(t *testing.T) {
 	mockUCase := new(mocks.ArticleUsecase)
 	num := 1
 	cursor := "2"
-	mockUCase.On("Fetch", cursor, int64(num)).Return(nil, "", models.NewErrorInternalServer())
+	mockUCase.On("Fetch", cursor, int64(num)).Return(nil, "", models.INTERNAL_SERVER_ERROR)
 
 	e := echo.New()
 	req, err := http.NewRequest(echo.GET, "/article?num=1&cursor="+cursor, strings.NewReader(""))
@@ -58,14 +60,16 @@ func TestFetchError(t *testing.T) {
 
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
-	handler := articleHttp.ArticleHandler{AUsecase: mockUCase, Helper: httpHelper.HttpHelper{}}
+	handler := articleHttp.HttpArticleHandler{
+		AUsecase: mockUCase,
+	}
 	handler.FetchArticle(c)
 
 	responseCursor := rec.Header().Get("X-Cursor")
 	assert.Equal(t, "", responseCursor)
 
 	assert.Equal(t, http.StatusInternalServerError, rec.Code)
-	mockUCase.AssertCalled(t, "Fetch", cursor, int64(num))
+	mockUCase.AssertExpectations(t)
 }
 
 func TestGetByID(t *testing.T) {
@@ -88,11 +92,13 @@ func TestGetByID(t *testing.T) {
 	c.SetPath("article/:id")
 	c.SetParamNames("id")
 	c.SetParamValues(strconv.Itoa(num))
-	handler := articleHttp.ArticleHandler{AUsecase: mockUCase, Helper: httpHelper.HttpHelper{}}
+	handler := articleHttp.HttpArticleHandler{
+		AUsecase: mockUCase,
+	}
 	handler.GetByID(c)
 
 	assert.Equal(t, http.StatusOK, rec.Code)
-	mockUCase.AssertCalled(t, "GetByID", int64(num))
+	mockUCase.AssertExpectations(t)
 }
 
 func TestStore(t *testing.T) {
@@ -110,7 +116,7 @@ func TestStore(t *testing.T) {
 	j, err := json.Marshal(tempMockArticle)
 	assert.NoError(t, err)
 
-	mockUCase.On("Store", &tempMockArticle).Return(&mockArticle, nil)
+	mockUCase.On("Store", mock.AnythingOfType("*article.Article")).Return(&mockArticle, nil)
 
 	e := echo.New()
 	req, err := http.NewRequest(echo.POST, "/article", strings.NewReader(string(j)))
@@ -121,11 +127,13 @@ func TestStore(t *testing.T) {
 	c := e.NewContext(req, rec)
 	c.SetPath("/article")
 
-	handler := articleHttp.ArticleHandler{AUsecase: mockUCase, Helper: httpHelper.HttpHelper{}}
+	handler := articleHttp.HttpArticleHandler{
+		AUsecase: mockUCase,
+	}
 	handler.Store(c)
 
 	assert.Equal(t, http.StatusCreated, rec.Code)
-	mockUCase.AssertCalled(t, "Store", &tempMockArticle)
+	mockUCase.AssertExpectations(t)
 }
 
 func TestDelete(t *testing.T) {
@@ -148,10 +156,12 @@ func TestDelete(t *testing.T) {
 	c.SetPath("article/:id")
 	c.SetParamNames("id")
 	c.SetParamValues(strconv.Itoa(num))
-	handler := articleHttp.ArticleHandler{AUsecase: mockUCase, Helper: httpHelper.HttpHelper{}}
+	handler := articleHttp.HttpArticleHandler{
+		AUsecase: mockUCase,
+	}
 	handler.Delete(c)
 
 	assert.Equal(t, http.StatusNoContent, rec.Code)
-	mockUCase.AssertCalled(t, "Delete", int64(num))
+	mockUCase.AssertExpectations(t)
 
 }

@@ -1,11 +1,10 @@
-package article
+package mysql
 
 import (
 	"database/sql"
-	"fmt"
 
-	"github.com/bxcodec/go-clean-arch/models"
-	"github.com/bxcodec/go-clean-arch/repository"
+	models "github.com/bxcodec/go-clean-arch/article"
+	"github.com/bxcodec/go-clean-arch/article/repository"
 )
 
 type mysqlArticleRepository struct {
@@ -17,8 +16,8 @@ func (m *mysqlArticleRepository) fetch(query string, args ...interface{}) ([]*mo
 	rows, err := m.Conn.Query(query, args...)
 
 	if err != nil {
-		fmt.Println("ERROR DB , ", err.Error())
-		return nil, models.NewErrorInternalServer()
+
+		return nil, models.INTERNAL_SERVER_ERROR
 	}
 	defer rows.Close()
 	result := make([]*models.Article, 0)
@@ -33,8 +32,8 @@ func (m *mysqlArticleRepository) fetch(query string, args ...interface{}) ([]*mo
 		)
 
 		if err != nil {
-			fmt.Println(" NEVER NEVER ", err, "")
-			return nil, models.NewErrorInternalServer()
+
+			return nil, models.INTERNAL_SERVER_ERROR
 		}
 		result = append(result, t)
 	}
@@ -63,7 +62,7 @@ func (m *mysqlArticleRepository) GetByID(id int64) (*models.Article, error) {
 	if len(list) > 0 {
 		a = list[0]
 	} else {
-		return nil, models.NewErrorNotFound()
+		return nil, models.NOT_FOUND_ERROR
 	}
 
 	return a, nil
@@ -82,24 +81,23 @@ func (m *mysqlArticleRepository) GetByTitle(title string) (*models.Article, erro
 	if len(list) > 0 {
 		a = list[0]
 	} else {
-		return nil, models.NewErrorNotFound()
+		return nil, models.NOT_FOUND_ERROR
 	}
 	return a, nil
 }
 
 func (m *mysqlArticleRepository) Store(a *models.Article) (int64, error) {
 
-	// query := `INSERT INTO article(title, content, created_at , updated_at) VALUES(? , ? , ?, ? )`
 	query := `INSERT  article SET title=? , content=? , updated_at=? , created_at=?`
 	stmt, err := m.Conn.Prepare(query)
 	if err != nil {
 
-		return 0, models.NewErrorInternalServer()
+		return 0, models.INTERNAL_SERVER_ERROR
 	}
 	res, err := stmt.Exec(a.Title, a.Content, a.CreatedAt, a.UpdatedAt)
 	if err != nil {
 
-		return 0, models.NewErrorInternalServer()
+		return 0, models.INTERNAL_SERVER_ERROR
 	}
 	return res.LastInsertId()
 }
@@ -109,19 +107,19 @@ func (m *mysqlArticleRepository) Delete(id int64) (bool, error) {
 
 	stmt, err := m.Conn.Prepare(query)
 	if err != nil {
-		return false, models.NewErrorInternalServer()
+		return false, models.INTERNAL_SERVER_ERROR
 	}
 	res, err := stmt.Exec(id)
 	if err != nil {
 
-		return false, models.NewErrorInternalServer()
+		return false, models.INTERNAL_SERVER_ERROR
 	}
 	rowsAfected, err := res.RowsAffected()
 	if err != nil {
-		return false, models.NewErrorInternalServer()
+		return false, models.INTERNAL_SERVER_ERROR
 	}
 	if rowsAfected <= 0 {
-		return false, models.NewErrorInternalServer()
+		return false, models.INTERNAL_SERVER_ERROR
 	}
 
 	return true, nil
@@ -142,7 +140,7 @@ func (m *mysqlArticleRepository) Update(ar *models.Article) (*models.Article, er
 		return nil, err
 	}
 	if affect < 1 {
-		return nil, models.NewErrorInternalServer()
+		return nil, models.INTERNAL_SERVER_ERROR
 	}
 
 	return ar, nil
