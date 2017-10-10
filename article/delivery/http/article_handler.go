@@ -1,4 +1,4 @@
-package article
+package http
 
 import (
 	"net/http"
