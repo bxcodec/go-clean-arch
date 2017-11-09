@@ -2,6 +2,9 @@ package mysql
 
 import (
 	"database/sql"
+	"time"
+
+	"github.com/Sirupsen/logrus"
 
 	models "github.com/bxcodec/go-clean-arch/article"
 	"github.com/bxcodec/go-clean-arch/article/repository"
@@ -92,12 +95,16 @@ func (m *mysqlArticleRepository) Store(a *models.Article) (int64, error) {
 	stmt, err := m.Conn.Prepare(query)
 	if err != nil {
 
-		return 0, models.INTERNAL_SERVER_ERROR
+		return 0, err
 	}
-	res, err := stmt.Exec(a.Title, a.Content, a.CreatedAt, a.UpdatedAt)
+	now := time.Now()
+	a.CreatedAt = now
+	a.UpdatedAt = now
+	logrus.Debug("Created At: ", now)
+	res, err := stmt.Exec(a.Title, a.Content, now, now)
 	if err != nil {
 
-		return 0, models.INTERNAL_SERVER_ERROR
+		return 0, err
 	}
 	return res.LastInsertId()
 }
@@ -107,18 +114,19 @@ func (m *mysqlArticleRepository) Delete(id int64) (bool, error) {
 
 	stmt, err := m.Conn.Prepare(query)
 	if err != nil {
-		return false, models.INTERNAL_SERVER_ERROR
+		return false, err
 	}
 	res, err := stmt.Exec(id)
 	if err != nil {
 
-		return false, models.INTERNAL_SERVER_ERROR
+		return false, err
 	}
 	rowsAfected, err := res.RowsAffected()
 	if err != nil {
-		return false, models.INTERNAL_SERVER_ERROR
+		return false, err
 	}
-	if rowsAfected <= 0 {
+	if rowsAfected != 1 {
+		logrus.Error("Weird  Behaviour. Total Affected ", rowsAfected)
 		return false, models.INTERNAL_SERVER_ERROR
 	}
 
@@ -131,7 +139,8 @@ func (m *mysqlArticleRepository) Update(ar *models.Article) (*models.Article, er
 	if err != nil {
 		return nil, nil
 	}
-	res, err := stmt.Exec(ar.Title, ar.Content, ar.UpdatedAt, ar.ID)
+	now := time.Now()
+	res, err := stmt.Exec(ar.Title, ar.Content, now, ar.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -139,7 +148,8 @@ func (m *mysqlArticleRepository) Update(ar *models.Article) (*models.Article, er
 	if err != nil {
 		return nil, err
 	}
-	if affect < 1 {
+	if affect != 1 {
+		logrus.Error("Weird  Behaviour. Total Affected ", affect)
 		return nil, models.INTERNAL_SERVER_ERROR
 	}
 

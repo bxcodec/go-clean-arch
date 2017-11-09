@@ -4,10 +4,14 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/Sirupsen/logrus"
+
 	models "github.com/bxcodec/go-clean-arch/article"
 
 	articleUcase "github.com/bxcodec/go-clean-arch/article/usecase"
 	"github.com/labstack/echo"
+
+	validator "gopkg.in/go-playground/validator.v9"
 )
 
 type HttpArticleHandler struct {
@@ -23,9 +27,8 @@ func (a *HttpArticleHandler) FetchArticle(c echo.Context) error {
 
 	listAr, nextCursor, err := a.AUsecase.Fetch(cursor, int64(num))
 
-	statusCode := getStatusCode(err)
 	if err != nil {
-		return c.JSON(statusCode, err.Error())
+		return c.JSON(getStatusCode(err), err.Error())
 	}
 	c.Response().Header().Set(`X-Cursor`, nextCursor)
 	return c.JSON(http.StatusOK, listAr)
@@ -37,24 +40,39 @@ func (a *HttpArticleHandler) GetByID(c echo.Context) error {
 	id := int64(idP)
 
 	art, err := a.AUsecase.GetByID(id)
-	statusCode := getStatusCode(err)
 
 	if err != nil {
-		return c.JSON(statusCode, err.Error())
+		return c.JSON(getStatusCode(err), err.Error())
 	}
 	return c.JSON(http.StatusOK, art)
+}
+
+func isRequestValid(m *models.Article) (bool, error) {
+
+	validate := validator.New()
+
+	err := validate.Struct(m)
+	if err != nil {
+		return false, err
+	}
+	return true, nil
 }
 
 func (a *HttpArticleHandler) Store(c echo.Context) error {
 	var article models.Article
 	err := c.Bind(&article)
 	if err != nil {
+		return c.JSON(http.StatusUnprocessableEntity, err.Error())
+	}
+
+	if ok, err := isRequestValid(&article); !ok {
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
+
 	ar, err := a.AUsecase.Store(&article)
-	statusCode := getStatusCode(err)
+
 	if err != nil {
-		return c.JSON(statusCode, err.Error())
+		return c.JSON(getStatusCode(err), err.Error())
 	}
 	return c.JSON(http.StatusCreated, ar)
 }
@@ -63,16 +81,21 @@ func (a *HttpArticleHandler) Delete(c echo.Context) error {
 	id := int64(idP)
 
 	_, err = a.AUsecase.Delete(id)
-	statusCode := getStatusCode(err)
+
 	if err != nil {
-		return c.JSON(statusCode, err.Error())
+
+		return c.JSON(getStatusCode(err), err.Error())
 	}
 	return c.NoContent(http.StatusNoContent)
 }
 
 func getStatusCode(err error) int {
+	if err != nil {
+		logrus.Error(err)
+	}
 	switch err {
 	case models.INTERNAL_SERVER_ERROR:
+
 		return http.StatusInternalServerError
 	case models.NOT_FOUND_ERROR:
 		return http.StatusNotFound
