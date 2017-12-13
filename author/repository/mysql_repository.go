@@ -44,6 +44,6 @@ func (m *mysqlAuthorRepo) getOne(query string, args ...interface{}) (*author.Aut
 }
 
 func (m *mysqlAuthorRepo) GetByID(id int64) (*author.Author, error) {
-	query := `SELECT id, name, created_at, updated_at WHERE id=?`
+	query := `SELECT id, name, created_at, updated_at FROM author WHERE id=?`
 	return m.getOne(query, id)
 }
