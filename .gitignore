@@ -2,3 +2,5 @@
 vendor/
 article_clean
 _*
+*.test
+.DS_Store

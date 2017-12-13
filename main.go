@@ -8,6 +8,7 @@ import (
 	httpDeliver "github.com/bxcodec/go-clean-arch/article/delivery/http"
 	articleRepo "github.com/bxcodec/go-clean-arch/article/repository"
 	articleUcase "github.com/bxcodec/go-clean-arch/article/usecase"
+	_authorRepo "github.com/bxcodec/go-clean-arch/author/repository"
 	cfg "github.com/bxcodec/go-clean-arch/config/env"
 	"github.com/bxcodec/go-clean-arch/config/middleware"
 	_ "github.com/go-sql-driver/mysql"
@@ -45,9 +46,9 @@ func main() {
 	e := echo.New()
 	middL := middleware.InitMiddleware()
 	e.Use(middL.CORS)
-
+	authorRepo := _authorRepo.NewMysqlAuthorRepository(dbConn)
 	ar := articleRepo.NewMysqlArticleRepository(dbConn)
-	au := articleUcase.NewArticleUsecase(ar)
+	au := articleUcase.NewArticleUsecase(ar, authorRepo)
 
 	httpDeliver.NewArticleHttpHandler(e, au)
 
