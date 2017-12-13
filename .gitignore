@@ -2,3 +2,4 @@
 vendor/
 article_clean
 _*
+*.test

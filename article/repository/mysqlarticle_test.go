@@ -4,6 +4,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/bxcodec/go-clean-arch/author"
+
 	models "github.com/bxcodec/go-clean-arch/article"
 	articleRepo "github.com/bxcodec/go-clean-arch/article/repository"
 	"github.com/stretchr/testify/assert"
@@ -16,11 +18,11 @@ func TestFetch(t *testing.T) {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
 	}
 	defer db.Close()
-	rows := sqlmock.NewRows([]string{"id", "title", "content", "updated_at", "created_at"}).
-		AddRow(1, "title 1", "Content 1", time.Now(), time.Now()).
-		AddRow(2, "title 2", "Content 2", time.Now(), time.Now())
+	rows := sqlmock.NewRows([]string{"id", "title", "content", "author_id", "updated_at", "created_at"}).
+		AddRow(1, "title 1", "Content 1", 1, time.Now(), time.Now()).
+		AddRow(2, "title 2", "Content 2", 1, time.Now(), time.Now())
 
-	query := "SELECT id,title,content,updated_at, created_at FROM article WHERE ID > \\? LIMIT \\?"
+	query := "SELECT id,title,content, author_id, updated_at, created_at FROM article WHERE ID > \\? LIMIT \\?"
 
 	mock.ExpectQuery(query).WillReturnRows(rows)
 	a := articleRepo.NewMysqlArticleRepository(db)
@@ -37,10 +39,10 @@ func TestGetByID(t *testing.T) {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
 	}
 	defer db.Close()
-	rows := sqlmock.NewRows([]string{"id", "title", "content", "updated_at", "created_at"}).
-		AddRow(1, "title 1", "Content 1", time.Now(), time.Now())
+	rows := sqlmock.NewRows([]string{"id", "title", "content", "author_id", "updated_at", "created_at"}).
+		AddRow(1, "title 1", "Content 1", 1, time.Now(), time.Now())
 
-	query := "SELECT id,title,content,updated_at, created_at FROM article WHERE ID = \\?"
+	query := "SELECT id,title,content, author_id, updated_at, created_at FROM article WHERE ID = \\?"
 
 	mock.ExpectQuery(query).WillReturnRows(rows)
 	a := articleRepo.NewMysqlArticleRepository(db)
@@ -58,6 +60,10 @@ func TestStore(t *testing.T) {
 		Content:   "Content",
 		CreatedAt: now,
 		UpdatedAt: now,
+		Author: author.Author{
+			ID:   1,
+			Name: "Iman Tumorang",
+		},
 	}
 	db, mock, err := sqlmock.New()
 	if err != nil {
@@ -65,9 +71,9 @@ func TestStore(t *testing.T) {
 	}
 	defer db.Close()
 
-	query := "INSERT  article SET title=\\? , content=\\? , updated_at=\\? , created_at=\\?"
+	query := "INSERT  article SET title=\\? , content=\\? , author_id=\\?, updated_at=\\? , created_at=\\?"
 	prep := mock.ExpectPrepare(query)
-	prep.ExpectExec().WithArgs(ar.Title, ar.Content, ar.CreatedAt, ar.UpdatedAt).WillReturnResult(sqlmock.NewResult(12, 1))
+	prep.ExpectExec().WithArgs(ar.Title, ar.Content, ar.Author.ID, ar.CreatedAt, ar.UpdatedAt).WillReturnResult(sqlmock.NewResult(12, 1))
 
 	a := articleRepo.NewMysqlArticleRepository(db)
 
@@ -82,10 +88,10 @@ func TestGetByTitle(t *testing.T) {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
 	}
 	defer db.Close()
-	rows := sqlmock.NewRows([]string{"id", "title", "content", "updated_at", "created_at"}).
-		AddRow(1, "title 1", "Content 1", time.Now(), time.Now())
+	rows := sqlmock.NewRows([]string{"id", "title", "content", "author_id", "updated_at", "created_at"}).
+		AddRow(1, "title 1", "Content 1", 1, time.Now(), time.Now())
 
-	query := "SELECT id,title,content,updated_at, created_at FROM article WHERE title = \\?"
+	query := "SELECT id,title,content, author_id, updated_at, created_at FROM article WHERE title = \\?"
 
 	mock.ExpectQuery(query).WillReturnRows(rows)
 	a := articleRepo.NewMysqlArticleRepository(db)
@@ -124,6 +130,10 @@ func TestUpdate(t *testing.T) {
 		Content:   "Content",
 		CreatedAt: now,
 		UpdatedAt: now,
+		Author: author.Author{
+			ID:   1,
+			Name: "Iman Tumorang",
+		},
 	}
 
 	db, mock, err := sqlmock.New()
@@ -132,10 +142,10 @@ func TestUpdate(t *testing.T) {
 	}
 	defer db.Close()
 
-	query := "UPDATE article set title=\\?, content=\\?, updated_at=\\? WHERE ID = \\?"
+	query := "UPDATE article set title=\\?, content=\\?, author_id=\\?, updated_at=\\? WHERE ID = \\?"
 
 	prep := mock.ExpectPrepare(query)
-	prep.ExpectExec().WithArgs(ar.Title, ar.Content, ar.UpdatedAt, ar.ID).WillReturnResult(sqlmock.NewResult(12, 1))
+	prep.ExpectExec().WithArgs(ar.Title, ar.Content, ar.Author.ID, ar.UpdatedAt, ar.ID).WillReturnResult(sqlmock.NewResult(12, 1))
 
 	a := articleRepo.NewMysqlArticleRepository(db)
 
