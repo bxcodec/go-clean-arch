@@ -3,6 +3,8 @@ package repository
 import (
 	"database/sql"
 
+	"github.com/bxcodec/go-clean-arch/author"
+
 	"github.com/Sirupsen/logrus"
 
 	models "github.com/bxcodec/go-clean-arch/article"
@@ -29,10 +31,12 @@ func (m *mysqlArticleRepository) fetch(query string, args ...interface{}) ([]*mo
 	result := make([]*models.Article, 0)
 	for rows.Next() {
 		t := new(models.Article)
+		authorID := int64(0)
 		err = rows.Scan(
 			&t.ID,
 			&t.Title,
 			&t.Content,
+			&authorID,
 			&t.UpdatedAt,
 			&t.CreatedAt,
 		)
@@ -40,6 +44,9 @@ func (m *mysqlArticleRepository) fetch(query string, args ...interface{}) ([]*mo
 		if err != nil {
 
 			return nil, models.INTERNAL_SERVER_ERROR
+		}
+		t.Author = author.Author{
+			ID: authorID,
 		}
 		result = append(result, t)
 	}
@@ -49,14 +56,14 @@ func (m *mysqlArticleRepository) fetch(query string, args ...interface{}) ([]*mo
 
 func (m *mysqlArticleRepository) Fetch(cursor string, num int64) ([]*models.Article, error) {
 
-	query := `SELECT id,title,content,updated_at, created_at
+	query := `SELECT id,title,content, author_id, updated_at, created_at
   						FROM article WHERE ID > ? LIMIT ?`
 
 	return m.fetch(query, cursor, num)
 
 }
 func (m *mysqlArticleRepository) GetByID(id int64) (*models.Article, error) {
-	query := `SELECT id,title,content,updated_at, created_at
+	query := `SELECT id,title,content, author_id, updated_at, created_at
   						FROM article WHERE ID = ?`
 
 	list, err := m.fetch(query, id)
@@ -75,7 +82,7 @@ func (m *mysqlArticleRepository) GetByID(id int64) (*models.Article, error) {
 }
 
 func (m *mysqlArticleRepository) GetByTitle(title string) (*models.Article, error) {
-	query := `SELECT id,title,content,updated_at, created_at
+	query := `SELECT id,title,content, author_id, updated_at, created_at
   						FROM article WHERE title = ?`
 
 	list, err := m.fetch(query, title)
@@ -94,7 +101,7 @@ func (m *mysqlArticleRepository) GetByTitle(title string) (*models.Article, erro
 
 func (m *mysqlArticleRepository) Store(a *models.Article) (int64, error) {
 
-	query := `INSERT  article SET title=? , content=? , updated_at=? , created_at=?`
+	query := `INSERT  article SET title=? , content=? , author_id=?, updated_at=? , created_at=?`
 	stmt, err := m.Conn.Prepare(query)
 	if err != nil {
 
@@ -102,7 +109,7 @@ func (m *mysqlArticleRepository) Store(a *models.Article) (int64, error) {
 	}
 
 	logrus.Debug("Created At: ", a.CreatedAt)
-	res, err := stmt.Exec(a.Title, a.Content, a.UpdatedAt, a.CreatedAt)
+	res, err := stmt.Exec(a.Title, a.Content, a.Author.ID, a.UpdatedAt, a.CreatedAt)
 	if err != nil {
 
 		return 0, err
@@ -134,14 +141,14 @@ func (m *mysqlArticleRepository) Delete(id int64) (bool, error) {
 	return true, nil
 }
 func (m *mysqlArticleRepository) Update(ar *models.Article) (*models.Article, error) {
-	query := `UPDATE article set title=?, content=?, updated_at=? WHERE ID = ?`
+	query := `UPDATE article set title=?, content=?, author_id=?, updated_at=? WHERE ID = ?`
 
 	stmt, err := m.Conn.Prepare(query)
 	if err != nil {
 		return nil, nil
 	}
 
-	res, err := stmt.Exec(ar.Title, ar.Content, ar.UpdatedAt, ar.ID)
+	res, err := stmt.Exec(ar.Title, ar.Content, ar.Author.ID, ar.UpdatedAt, ar.ID)
 	if err != nil {
 		return nil, err
 	}
