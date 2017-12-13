@@ -1,11 +1,11 @@
-package mysql_test
+package repository_test
 
 import (
 	"testing"
 	"time"
 
 	models "github.com/bxcodec/go-clean-arch/article"
-	articleRepo "github.com/bxcodec/go-clean-arch/article/repository/mysql"
+	articleRepo "github.com/bxcodec/go-clean-arch/article/repository"
 	"github.com/stretchr/testify/assert"
 	sqlmock "gopkg.in/DATA-DOG/go-sqlmock.v1"
 )
@@ -52,12 +52,12 @@ func TestGetByID(t *testing.T) {
 }
 
 func TestStore(t *testing.T) {
-
+	now := time.Now()
 	ar := &models.Article{
 		Title:     "Judul",
 		Content:   "Content",
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
+		CreatedAt: now,
+		UpdatedAt: now,
 	}
 	db, mock, err := sqlmock.New()
 	if err != nil {
@@ -117,13 +117,13 @@ func TestDelete(t *testing.T) {
 }
 
 func TestUpdate(t *testing.T) {
-
+	now := time.Now()
 	ar := &models.Article{
 		ID:        12,
 		Title:     "Judul",
 		Content:   "Content",
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
+		CreatedAt: now,
+		UpdatedAt: now,
 	}
 
 	db, mock, err := sqlmock.New()

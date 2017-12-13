@@ -1,17 +1,20 @@
-package mysql
+package repository
 
 import (
 	"database/sql"
-	"time"
 
 	"github.com/Sirupsen/logrus"
 
 	models "github.com/bxcodec/go-clean-arch/article"
-	"github.com/bxcodec/go-clean-arch/article/repository"
 )
 
 type mysqlArticleRepository struct {
 	Conn *sql.DB
+}
+
+func NewMysqlArticleRepository(Conn *sql.DB) ArticleRepository {
+
+	return &mysqlArticleRepository{Conn}
 }
 
 func (m *mysqlArticleRepository) fetch(query string, args ...interface{}) ([]*models.Article, error) {
@@ -97,11 +100,9 @@ func (m *mysqlArticleRepository) Store(a *models.Article) (int64, error) {
 
 		return 0, err
 	}
-	now := time.Now()
-	a.CreatedAt = now
-	a.UpdatedAt = now
-	logrus.Debug("Created At: ", now)
-	res, err := stmt.Exec(a.Title, a.Content, now, now)
+
+	logrus.Debug("Created At: ", a.CreatedAt)
+	res, err := stmt.Exec(a.Title, a.Content, a.UpdatedAt, a.CreatedAt)
 	if err != nil {
 
 		return 0, err
@@ -139,8 +140,8 @@ func (m *mysqlArticleRepository) Update(ar *models.Article) (*models.Article, er
 	if err != nil {
 		return nil, nil
 	}
-	now := time.Now()
-	res, err := stmt.Exec(ar.Title, ar.Content, now, ar.ID)
+
+	res, err := stmt.Exec(ar.Title, ar.Content, ar.UpdatedAt, ar.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -154,9 +155,4 @@ func (m *mysqlArticleRepository) Update(ar *models.Article) (*models.Article, er
 	}
 
 	return ar, nil
-}
-
-func NewMysqlArticleRepository(Conn *sql.DB) repository.ArticleRepository {
-
-	return &mysqlArticleRepository{Conn}
 }
