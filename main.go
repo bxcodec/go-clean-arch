@@ -6,7 +6,7 @@ import (
 	"net/url"
 
 	httpDeliver "github.com/bxcodec/go-clean-arch/article/delivery/http"
-	articleRepo "github.com/bxcodec/go-clean-arch/article/repository/mysql"
+	articleRepo "github.com/bxcodec/go-clean-arch/article/repository"
 	articleUcase "github.com/bxcodec/go-clean-arch/article/usecase"
 	cfg "github.com/bxcodec/go-clean-arch/config/env"
 	"github.com/bxcodec/go-clean-arch/config/middleware"
