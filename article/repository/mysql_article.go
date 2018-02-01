@@ -2,10 +2,11 @@ package repository
 
 import (
 	"database/sql"
+	"fmt"
 
 	"github.com/bxcodec/go-clean-arch/author"
 
-	"github.com/Sirupsen/logrus"
+	"github.com/sirupsen/logrus"
 
 	models "github.com/bxcodec/go-clean-arch/article"
 )
@@ -24,8 +25,8 @@ func (m *mysqlArticleRepository) fetch(query string, args ...interface{}) ([]*mo
 	rows, err := m.Conn.Query(query, args...)
 
 	if err != nil {
-
-		return nil, models.INTERNAL_SERVER_ERROR
+		logrus.Error(err)
+		return nil, err
 	}
 	defer rows.Close()
 	result := make([]*models.Article, 0)
@@ -42,8 +43,8 @@ func (m *mysqlArticleRepository) fetch(query string, args ...interface{}) ([]*mo
 		)
 
 		if err != nil {
-
-			return nil, models.INTERNAL_SERVER_ERROR
+			logrus.Error(err)
+			return nil, err
 		}
 		t.Author = author.Author{
 			ID: authorID,
@@ -134,8 +135,9 @@ func (m *mysqlArticleRepository) Delete(id int64) (bool, error) {
 		return false, err
 	}
 	if rowsAfected != 1 {
-		logrus.Error("Weird  Behaviour. Total Affected ", rowsAfected)
-		return false, models.INTERNAL_SERVER_ERROR
+		err = fmt.Errorf("Weird  Behaviour. Total Affected: %d", rowsAfected)
+		logrus.Error(err)
+		return false, err
 	}
 
 	return true, nil
@@ -157,8 +159,9 @@ func (m *mysqlArticleRepository) Update(ar *models.Article) (*models.Article, er
 		return nil, err
 	}
 	if affect != 1 {
-		logrus.Error("Weird  Behaviour. Total Affected ", affect)
-		return nil, models.INTERNAL_SERVER_ERROR
+		err = fmt.Errorf("Weird  Behaviour. Total Affected: %d", affect)
+		logrus.Error(err)
+		return nil, err
 	}
 
 	return ar, nil

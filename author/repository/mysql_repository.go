@@ -3,7 +3,7 @@ package repository
 import (
 	"database/sql"
 
-	"github.com/Sirupsen/logrus"
+	"github.com/sirupsen/logrus"
 
 	"github.com/bxcodec/go-clean-arch/author"
 )

@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/Sirupsen/logrus"
+	"github.com/sirupsen/logrus"
 
 	models "github.com/bxcodec/go-clean-arch/article"
 
@@ -90,9 +90,12 @@ func (a *HttpArticleHandler) Delete(c echo.Context) error {
 }
 
 func getStatusCode(err error) int {
-	if err != nil {
-		logrus.Error(err)
+
+	if err == nil {
+		return http.StatusOK
 	}
+
+	logrus.Error(err)
 	switch err {
 	case models.INTERNAL_SERVER_ERROR:
 
