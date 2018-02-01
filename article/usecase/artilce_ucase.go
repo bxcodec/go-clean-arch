@@ -4,8 +4,8 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/Sirupsen/logrus"
 	"github.com/bxcodec/go-clean-arch/author"
+	"github.com/sirupsen/logrus"
 
 	"github.com/bxcodec/go-clean-arch/article"
 	"github.com/bxcodec/go-clean-arch/article/repository"
@@ -65,28 +65,17 @@ func (a *articleUsecase) getAuthorDetails(data []*article.Article) ([]*article.A
 		totalCall++
 	}
 
-	totalReceived := 0
 	mapAuthor := make(map[int64]*author.Author)
-	receivingDone := false
-	for {
+	totalGorutineCalled := len(existingAuthorMap)
+	for i := 0; i < totalGorutineCalled; i++ {
 		select {
 		case a := <-chAuthor:
-			totalReceived++
 			if a.Error == nil && a.Author != nil {
 				mapAuthor[a.Author.ID] = a.Author
 			}
-
 		case <-time.After(time.Second * 1):
 			logrus.Warn("Timeout when calling user detail")
-			receivingDone = true
-		}
 
-		if totalReceived == len(existingAuthorMap) {
-			receivingDone = true
-		}
-
-		if receivingDone {
-			break
 		}
 	}
 
