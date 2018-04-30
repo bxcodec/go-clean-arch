@@ -3,7 +3,9 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	"log"
 	"net/url"
+	"os"
 
 	httpDeliver "github.com/bxcodec/go-clean-arch/article/delivery/http"
 	articleRepo "github.com/bxcodec/go-clean-arch/article/repository"
@@ -45,6 +47,12 @@ func main() {
 	if err != nil && viper.GetBool("debug") {
 		fmt.Println(err)
 	}
+	err = dbConn.Ping()
+	if err != nil {
+		log.Fatal(err)
+		os.Exit(1)
+	}
+
 	defer dbConn.Close()
 	e := echo.New()
 	middL := middleware.InitMiddleware()

@@ -1,5 +1,10 @@
 # go-clean-arch
 
+## Looking for the old code ? 
+If you are looking for the old code, you can checkout to the [v1 branch](https://github.com/bxcodec/go-clean-arch/tree/v1)
+Last Updated: April 30th 2018
+
+## Description
 This is an example of implementation of Clean Architecture in Go (Golang) projects.
 
 Rule of Clean Architecture by Uncle Bob
@@ -32,7 +37,7 @@ git clone https://github.com/bxcodec/go-clean-arch.git
 cd go-clean-arch
 
 # Install Dependencies
-glide install -v
+dep ensure
 
 # Make File
 make
