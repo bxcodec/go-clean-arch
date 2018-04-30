@@ -59,7 +59,7 @@ go get github.com/bxcodec/go-clean-arch
 cd $GOPATH/src/github.com/bxcodec/go-clean-arch
 
 # Install Dependencies
-glide install -v
+dep ensure
 
 # Make File
 make
