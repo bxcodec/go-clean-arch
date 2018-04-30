@@ -70,3 +70,6 @@ go run main.go
 
 
 > Make Sure you have run the article.sql in your mysql
+
+### Change log 
+ - 2018-04-30 : [Move to new projects folder](https://github.com/bxcodec/go-clean-arch/pull/8)
