@@ -9,9 +9,9 @@ import (
 	"testing"
 	"time"
 
-	models "github.com/bxcodec/go-clean-arch/article"
 	articleHttp "github.com/bxcodec/go-clean-arch/article/delivery/http"
-	"github.com/bxcodec/go-clean-arch/article/usecase/mocks"
+	"github.com/bxcodec/go-clean-arch/article/mocks"
+	models "github.com/bxcodec/go-clean-arch/models"
 	"github.com/labstack/echo"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -116,7 +116,7 @@ func TestStore(t *testing.T) {
 	j, err := json.Marshal(tempMockArticle)
 	assert.NoError(t, err)
 
-	mockUCase.On("Store", mock.AnythingOfType("*article.Article")).Return(&mockArticle, nil)
+	mockUCase.On("Store", mock.AnythingOfType("*models.Article")).Return(&mockArticle, nil)
 
 	e := echo.New()
 	req, err := http.NewRequest(echo.POST, "/article", strings.NewReader(string(j)))

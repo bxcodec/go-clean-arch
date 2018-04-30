@@ -6,20 +6,21 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"github.com/bxcodec/go-clean-arch/author"
+	"github.com/bxcodec/go-clean-arch/models"
 )
 
 type mysqlAuthorRepo struct {
 	DB *sql.DB
 }
 
-func NewMysqlAuthorRepository(db *sql.DB) AuthorRepository {
+func NewMysqlAuthorRepository(db *sql.DB) author.AuthorRepository {
 
 	return &mysqlAuthorRepo{
 		DB: db,
 	}
 }
 
-func (m *mysqlAuthorRepo) getOne(query string, args ...interface{}) (*author.Author, error) {
+func (m *mysqlAuthorRepo) getOne(query string, args ...interface{}) (*models.Author, error) {
 
 	stmt, err := m.DB.Prepare(query)
 	if err != nil {
@@ -27,7 +28,7 @@ func (m *mysqlAuthorRepo) getOne(query string, args ...interface{}) (*author.Aut
 		return nil, err
 	}
 	row := stmt.QueryRow(args...)
-	a := &author.Author{}
+	a := &models.Author{}
 
 	err = row.Scan(
 		&a.ID,
@@ -43,7 +44,7 @@ func (m *mysqlAuthorRepo) getOne(query string, args ...interface{}) (*author.Aut
 	return a, nil
 }
 
-func (m *mysqlAuthorRepo) GetByID(id int64) (*author.Author, error) {
+func (m *mysqlAuthorRepo) GetByID(id int64) (*models.Author, error) {
 	query := `SELECT id, name, created_at, updated_at FROM author WHERE id=?`
 	return m.getOne(query, id)
 }

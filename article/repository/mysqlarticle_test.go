@@ -4,10 +4,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/bxcodec/go-clean-arch/author"
-
-	models "github.com/bxcodec/go-clean-arch/article"
 	articleRepo "github.com/bxcodec/go-clean-arch/article/repository"
+	models "github.com/bxcodec/go-clean-arch/models"
 	"github.com/stretchr/testify/assert"
 	sqlmock "gopkg.in/DATA-DOG/go-sqlmock.v1"
 )
@@ -60,7 +58,7 @@ func TestStore(t *testing.T) {
 		Content:   "Content",
 		CreatedAt: now,
 		UpdatedAt: now,
-		Author: author.Author{
+		Author: models.Author{
 			ID:   1,
 			Name: "Iman Tumorang",
 		},
@@ -130,7 +128,7 @@ func TestUpdate(t *testing.T) {
 		Content:   "Content",
 		CreatedAt: now,
 		UpdatedAt: now,
-		Author: author.Author{
+		Author: models.Author{
 			ID:   1,
 			Name: "Iman Tumorang",
 		},

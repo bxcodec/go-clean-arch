@@ -9,18 +9,21 @@ import (
 	articleRepo "github.com/bxcodec/go-clean-arch/article/repository"
 	articleUcase "github.com/bxcodec/go-clean-arch/article/usecase"
 	_authorRepo "github.com/bxcodec/go-clean-arch/author/repository"
-	cfg "github.com/bxcodec/go-clean-arch/config/env"
-	"github.com/bxcodec/go-clean-arch/config/middleware"
+	"github.com/bxcodec/go-clean-arch/middleware"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/labstack/echo"
+	"github.com/spf13/viper"
 )
 
-var config cfg.Config
-
 func init() {
-	config = cfg.NewViperConfig()
+	viper.SetConfigFile(`config.json`)
+	err := viper.ReadInConfig()
 
-	if config.GetBool(`debug`) {
+	if err != nil {
+		panic(err)
+	}
+
+	if viper.GetBool(`debug`) {
 		fmt.Println("Service RUN on DEBUG mode")
 	}
 
@@ -28,18 +31,18 @@ func init() {
 
 func main() {
 
-	dbHost := config.GetString(`database.host`)
-	dbPort := config.GetString(`database.port`)
-	dbUser := config.GetString(`database.user`)
-	dbPass := config.GetString(`database.pass`)
-	dbName := config.GetString(`database.name`)
+	dbHost := viper.GetString(`database.host`)
+	dbPort := viper.GetString(`database.port`)
+	dbUser := viper.GetString(`database.user`)
+	dbPass := viper.GetString(`database.pass`)
+	dbName := viper.GetString(`database.name`)
 	connection := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", dbUser, dbPass, dbHost, dbPort, dbName)
 	val := url.Values{}
 	val.Add("parseTime", "1")
 	val.Add("loc", "Asia/Jakarta")
 	dsn := fmt.Sprintf("%s?%s", connection, val.Encode())
 	dbConn, err := sql.Open(`mysql`, dsn)
-	if err != nil && config.GetBool("debug") {
+	if err != nil && viper.GetBool("debug") {
 		fmt.Println(err)
 	}
 	defer dbConn.Close()
@@ -52,5 +55,5 @@ func main() {
 
 	httpDeliver.NewArticleHttpHandler(e, au)
 
-	e.Start(config.GetString("server.address"))
+	e.Start(viper.GetString("server.address"))
 }

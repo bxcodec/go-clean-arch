@@ -4,41 +4,31 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/bxcodec/go-clean-arch/author"
+	"github.com/bxcodec/go-clean-arch/models"
 	"github.com/sirupsen/logrus"
 
 	"github.com/bxcodec/go-clean-arch/article"
-	"github.com/bxcodec/go-clean-arch/article/repository"
-	_authorRepo "github.com/bxcodec/go-clean-arch/author/repository"
+	_authorRepo "github.com/bxcodec/go-clean-arch/author"
 )
 
-type ArticleUsecase interface {
-	Fetch(cursor string, num int64) ([]*article.Article, string, error)
-	GetByID(id int64) (*article.Article, error)
-	Update(ar *article.Article) (*article.Article, error)
-	GetByTitle(title string) (*article.Article, error)
-	Store(*article.Article) (*article.Article, error)
-	Delete(id int64) (bool, error)
-}
-
 type articleUsecase struct {
-	articleRepos repository.ArticleRepository
+	articleRepos article.ArticleRepository
 	authorRepo   _authorRepo.AuthorRepository
 }
 
 type authorChanel struct {
-	Author *author.Author
+	Author *models.Author
 	Error  error
 }
 
-func NewArticleUsecase(a repository.ArticleRepository, ar _authorRepo.AuthorRepository) ArticleUsecase {
+func NewArticleUsecase(a article.ArticleRepository, ar _authorRepo.AuthorRepository) article.ArticleUsecase {
 	return &articleUsecase{
 		articleRepos: a,
 		authorRepo:   ar,
 	}
 }
 
-func (a *articleUsecase) getAuthorDetail(item *article.Article, authorChan chan authorChanel) {
+func (a *articleUsecase) getAuthorDetail(item *models.Article, authorChan chan authorChanel) {
 	defer func() {
 		if r := recover(); r != nil {
 			logrus.Debug("Recovered in ", r)
@@ -52,7 +42,7 @@ func (a *articleUsecase) getAuthorDetail(item *article.Article, authorChan chan 
 	}
 	authorChan <- holder
 }
-func (a *articleUsecase) getAuthorDetails(data []*article.Article) ([]*article.Article, error) {
+func (a *articleUsecase) getAuthorDetails(data []*models.Article) ([]*models.Article, error) {
 	chAuthor := make(chan authorChanel)
 	defer close(chAuthor)
 	existingAuthorMap := make(map[int64]bool)
@@ -65,7 +55,7 @@ func (a *articleUsecase) getAuthorDetails(data []*article.Article) ([]*article.A
 		totalCall++
 	}
 
-	mapAuthor := make(map[int64]*author.Author)
+	mapAuthor := make(map[int64]*models.Author)
 	totalGorutineCalled := len(existingAuthorMap)
 	for i := 0; i < totalGorutineCalled; i++ {
 		select {
@@ -89,7 +79,7 @@ func (a *articleUsecase) getAuthorDetails(data []*article.Article) ([]*article.A
 	return data, nil
 }
 
-func (a *articleUsecase) Fetch(cursor string, num int64) ([]*article.Article, string, error) {
+func (a *articleUsecase) Fetch(cursor string, num int64) ([]*models.Article, string, error) {
 	if num == 0 {
 		num = 10
 	}
@@ -114,7 +104,7 @@ func (a *articleUsecase) Fetch(cursor string, num int64) ([]*article.Article, st
 	return listArticle, nextCursor, nil
 }
 
-func (a *articleUsecase) GetByID(id int64) (*article.Article, error) {
+func (a *articleUsecase) GetByID(id int64) (*models.Article, error) {
 
 	res, err := a.articleRepos.GetByID(id)
 	if err != nil {
@@ -129,12 +119,12 @@ func (a *articleUsecase) GetByID(id int64) (*article.Article, error) {
 	return res, nil
 }
 
-func (a *articleUsecase) Update(ar *article.Article) (*article.Article, error) {
+func (a *articleUsecase) Update(ar *models.Article) (*models.Article, error) {
 	ar.UpdatedAt = time.Now()
 	return a.articleRepos.Update(ar)
 }
 
-func (a *articleUsecase) GetByTitle(title string) (*article.Article, error) {
+func (a *articleUsecase) GetByTitle(title string) (*models.Article, error) {
 
 	res, err := a.articleRepos.GetByTitle(title)
 	if err != nil {
@@ -150,11 +140,11 @@ func (a *articleUsecase) GetByTitle(title string) (*article.Article, error) {
 	return res, nil
 }
 
-func (a *articleUsecase) Store(m *article.Article) (*article.Article, error) {
+func (a *articleUsecase) Store(m *models.Article) (*models.Article, error) {
 
 	existedArticle, _ := a.GetByTitle(m.Title)
 	if existedArticle != nil {
-		return nil, article.CONFLIT_ERROR
+		return nil, models.CONFLIT_ERROR
 	}
 
 	id, err := a.articleRepos.Store(m)
@@ -171,7 +161,7 @@ func (a *articleUsecase) Delete(id int64) (bool, error) {
 	logrus.Info("Masuk Sini")
 	if existedArticle == nil {
 		logrus.Info("Masuk Sini2")
-		return false, article.NOT_FOUND_ERROR
+		return false, models.NOT_FOUND_ERROR
 	}
 	logrus.Info("Masuk Sini3")
 

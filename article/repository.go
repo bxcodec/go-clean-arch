@@ -1,6 +1,6 @@
-package repository
+package article
 
-import models "github.com/bxcodec/go-clean-arch/article"
+import "github.com/bxcodec/go-clean-arch/models"
 
 type ArticleRepository interface {
 	Fetch(cursor string, num int64) ([]*models.Article, error)

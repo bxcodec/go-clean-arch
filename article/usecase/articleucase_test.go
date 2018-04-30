@@ -5,12 +5,10 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/bxcodec/go-clean-arch/author"
-
-	models "github.com/bxcodec/go-clean-arch/article"
-	"github.com/bxcodec/go-clean-arch/article/repository/mocks"
+	"github.com/bxcodec/go-clean-arch/article/mocks"
 	ucase "github.com/bxcodec/go-clean-arch/article/usecase"
-	_authorMock "github.com/bxcodec/go-clean-arch/author/repository/mocks"
+	_authorMock "github.com/bxcodec/go-clean-arch/author/mocks"
+	models "github.com/bxcodec/go-clean-arch/models"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -25,7 +23,7 @@ func TestFetch(t *testing.T) {
 	mockListArtilce := make([]*models.Article, 0)
 	mockListArtilce = append(mockListArtilce, mockArticle)
 	mockArticleRepo.On("Fetch", mock.AnythingOfType("string"), mock.AnythingOfType("int64")).Return(mockListArtilce, nil)
-	mockAuthor := &author.Author{
+	mockAuthor := &models.Author{
 		ID:   1,
 		Name: "Iman Tumorang",
 	}
@@ -73,7 +71,7 @@ func TestGetByID(t *testing.T) {
 	mockArticleRepo.On("GetByID", mock.AnythingOfType("int64")).Return(&mockArticle, nil)
 	defer mockArticleRepo.AssertCalled(t, "GetByID", mock.AnythingOfType("int64"))
 
-	mockAuthor := &author.Author{
+	mockAuthor := &models.Author{
 		ID:   1,
 		Name: "Iman Tumorang",
 	}
@@ -99,9 +97,7 @@ func TestStore(t *testing.T) {
 	tempMockArticle.ID = 0
 
 	mockArticleRepo.On("GetByTitle", mock.AnythingOfType("string")).Return(nil, models.NOT_FOUND_ERROR)
-	mockArticleRepo.On("Store", mock.AnythingOfType("*article.Article")).Return(mockArticle.ID, nil)
-	defer mockArticleRepo.AssertCalled(t, "GetByTitle", mock.AnythingOfType("string"))
-	defer mockArticleRepo.AssertCalled(t, "Store", mock.AnythingOfType("*article.Article"))
+	mockArticleRepo.On("Store", mock.AnythingOfType("*models.Article")).Return(mockArticle.ID, nil)
 
 	mockAuthorrepo := new(_authorMock.AuthorRepository)
 	u := ucase.NewArticleUsecase(mockArticleRepo, mockAuthorrepo)
@@ -111,7 +107,7 @@ func TestStore(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, a)
 	assert.Equal(t, mockArticle.Title, tempMockArticle.Title)
-
+	mockArticleRepo.AssertExpectations(t)
 }
 
 func TestDelete(t *testing.T) {
