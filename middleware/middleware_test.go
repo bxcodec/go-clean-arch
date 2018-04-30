@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/bxcodec/go-clean-arch/config/middleware"
+	"github.com/bxcodec/go-clean-arch/middleware"
 	"github.com/labstack/echo"
 
 	test "net/http/httptest"
