@@ -1,4 +1,4 @@
-package author
+package models
 
 type Author struct {
 	ID        int64  `json:"id"`

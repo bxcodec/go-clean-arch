@@ -4,18 +4,19 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/bxcodec/go-clean-arch/author"
+	author "github.com/bxcodec/go-clean-arch/models"
 
 	"github.com/sirupsen/logrus"
 
-	models "github.com/bxcodec/go-clean-arch/article"
+	article "github.com/bxcodec/go-clean-arch/article"
+	models "github.com/bxcodec/go-clean-arch/models"
 )
 
 type mysqlArticleRepository struct {
 	Conn *sql.DB
 }
 
-func NewMysqlArticleRepository(Conn *sql.DB) ArticleRepository {
+func NewMysqlArticleRepository(Conn *sql.DB) article.ArticleRepository {
 
 	return &mysqlArticleRepository{Conn}
 }

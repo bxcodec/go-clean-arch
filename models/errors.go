@@ -1,4 +1,4 @@
-package article
+package models
 
 import "errors"
 
