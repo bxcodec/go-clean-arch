@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"context"
 	"strconv"
 	"time"
 
@@ -12,8 +13,9 @@ import (
 )
 
 type articleUsecase struct {
-	articleRepos article.ArticleRepository
-	authorRepo   _authorRepo.AuthorRepository
+	articleRepos   article.ArticleRepository
+	authorRepo     _authorRepo.AuthorRepository
+	contextTimeout time.Duration
 }
 
 type authorChanel struct {
@@ -21,38 +23,36 @@ type authorChanel struct {
 	Error  error
 }
 
-func NewArticleUsecase(a article.ArticleRepository, ar _authorRepo.AuthorRepository) article.ArticleUsecase {
+func NewArticleUsecase(a article.ArticleRepository, ar _authorRepo.AuthorRepository, timeout time.Duration) article.ArticleUsecase {
 	return &articleUsecase{
-		articleRepos: a,
-		authorRepo:   ar,
+		articleRepos:   a,
+		authorRepo:     ar,
+		contextTimeout: timeout,
 	}
 }
 
-func (a *articleUsecase) getAuthorDetail(item *models.Article, authorChan chan authorChanel) {
-	defer func() {
-		if r := recover(); r != nil {
-			logrus.Debug("Recovered in ", r)
-		}
-	}()
+func (a *articleUsecase) getAuthorDetail(ctx context.Context, item *models.Article, authorChan chan authorChanel) {
 
-	res, err := a.authorRepo.GetByID(item.Author.ID)
+	res, err := a.authorRepo.GetByID(ctx, item.Author.ID)
 	holder := authorChanel{
 		Author: res,
 		Error:  err,
 	}
+	if ctx.Err() != nil {
+		return // To avoid send on closed channel
+	}
 	authorChan <- holder
 }
-func (a *articleUsecase) getAuthorDetails(data []*models.Article) ([]*models.Article, error) {
+func (a *articleUsecase) getAuthorDetails(ctx context.Context, data []*models.Article) ([]*models.Article, error) {
 	chAuthor := make(chan authorChanel)
 	defer close(chAuthor)
 	existingAuthorMap := make(map[int64]bool)
-	totalCall := 0
 	for _, item := range data {
 		if _, ok := existingAuthorMap[item.Author.ID]; !ok {
 			existingAuthorMap[item.Author.ID] = true
-			go a.getAuthorDetail(item, chAuthor)
+			go a.getAuthorDetail(ctx, item, chAuthor)
 		}
-		totalCall++
+
 	}
 
 	mapAuthor := make(map[int64]*models.Author)
@@ -60,17 +60,21 @@ func (a *articleUsecase) getAuthorDetails(data []*models.Article) ([]*models.Art
 	for i := 0; i < totalGorutineCalled; i++ {
 		select {
 		case a := <-chAuthor:
-			if a.Error == nil && a.Author != nil {
-				mapAuthor[a.Author.ID] = a.Author
+			if a.Error == nil {
+				if a.Author != nil {
+					mapAuthor[a.Author.ID] = a.Author
+				}
+			} else {
+				return nil, a.Error
 			}
-		case <-time.After(time.Second * 1):
-			logrus.Warn("Timeout when calling user detail")
 
+		case <-ctx.Done():
+			logrus.Warn("Timeout when calling user detail")
+			return nil, ctx.Err()
 		}
 	}
 
 	// merge the author
-
 	for index, item := range data {
 		if a, ok := mapAuthor[item.Author.ID]; ok {
 			data[index].Author = *a
@@ -79,19 +83,22 @@ func (a *articleUsecase) getAuthorDetails(data []*models.Article) ([]*models.Art
 	return data, nil
 }
 
-func (a *articleUsecase) Fetch(cursor string, num int64) ([]*models.Article, string, error) {
+func (a *articleUsecase) Fetch(c context.Context, cursor string, num int64) ([]*models.Article, string, error) {
 	if num == 0 {
 		num = 10
 	}
 
-	listArticle, err := a.articleRepos.Fetch(cursor, num)
+	ctx, cancel := context.WithTimeout(c, a.contextTimeout)
+	defer cancel()
+
+	listArticle, err := a.articleRepos.Fetch(ctx, cursor, num)
 	if err != nil {
 		return nil, "", err
 	}
 
 	nextCursor := ""
 
-	listArticle, err = a.getAuthorDetails(listArticle)
+	listArticle, err = a.getAuthorDetails(ctx, listArticle)
 	if err != nil {
 		return nil, "", err
 	}
@@ -104,14 +111,17 @@ func (a *articleUsecase) Fetch(cursor string, num int64) ([]*models.Article, str
 	return listArticle, nextCursor, nil
 }
 
-func (a *articleUsecase) GetByID(id int64) (*models.Article, error) {
+func (a *articleUsecase) GetByID(c context.Context, id int64) (*models.Article, error) {
 
-	res, err := a.articleRepos.GetByID(id)
+	ctx, cancel := context.WithTimeout(c, a.contextTimeout)
+	defer cancel()
+
+	res, err := a.articleRepos.GetByID(ctx, id)
 	if err != nil {
 		return nil, err
 	}
 
-	resAuthor, err := a.authorRepo.GetByID(res.Author.ID)
+	resAuthor, err := a.authorRepo.GetByID(ctx, res.Author.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -119,19 +129,25 @@ func (a *articleUsecase) GetByID(id int64) (*models.Article, error) {
 	return res, nil
 }
 
-func (a *articleUsecase) Update(ar *models.Article) (*models.Article, error) {
+func (a *articleUsecase) Update(c context.Context, ar *models.Article) (*models.Article, error) {
+
+	ctx, cancel := context.WithTimeout(c, a.contextTimeout)
+	defer cancel()
+
 	ar.UpdatedAt = time.Now()
-	return a.articleRepos.Update(ar)
+	return a.articleRepos.Update(ctx, ar)
 }
 
-func (a *articleUsecase) GetByTitle(title string) (*models.Article, error) {
+func (a *articleUsecase) GetByTitle(c context.Context, title string) (*models.Article, error) {
 
-	res, err := a.articleRepos.GetByTitle(title)
+	ctx, cancel := context.WithTimeout(c, a.contextTimeout)
+	defer cancel()
+	res, err := a.articleRepos.GetByTitle(ctx, title)
 	if err != nil {
 		return nil, err
 	}
 
-	resAuthor, err := a.authorRepo.GetByID(res.Author.ID)
+	resAuthor, err := a.authorRepo.GetByID(ctx, res.Author.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -140,14 +156,16 @@ func (a *articleUsecase) GetByTitle(title string) (*models.Article, error) {
 	return res, nil
 }
 
-func (a *articleUsecase) Store(m *models.Article) (*models.Article, error) {
+func (a *articleUsecase) Store(c context.Context, m *models.Article) (*models.Article, error) {
 
-	existedArticle, _ := a.GetByTitle(m.Title)
+	ctx, cancel := context.WithTimeout(c, a.contextTimeout)
+	defer cancel()
+	existedArticle, _ := a.GetByTitle(ctx, m.Title)
 	if existedArticle != nil {
 		return nil, models.CONFLIT_ERROR
 	}
 
-	id, err := a.articleRepos.Store(m)
+	id, err := a.articleRepos.Store(ctx, m)
 	if err != nil {
 		return nil, err
 	}
@@ -156,14 +174,12 @@ func (a *articleUsecase) Store(m *models.Article) (*models.Article, error) {
 	return m, nil
 }
 
-func (a *articleUsecase) Delete(id int64) (bool, error) {
-	existedArticle, _ := a.articleRepos.GetByID(id)
-	logrus.Info("Masuk Sini")
+func (a *articleUsecase) Delete(c context.Context, id int64) (bool, error) {
+	ctx, cancel := context.WithTimeout(c, a.contextTimeout)
+	defer cancel()
+	existedArticle, _ := a.articleRepos.GetByID(ctx, id)
 	if existedArticle == nil {
-		logrus.Info("Masuk Sini2")
 		return false, models.NOT_FOUND_ERROR
 	}
-	logrus.Info("Masuk Sini3")
-
-	return a.articleRepos.Delete(id)
+	return a.articleRepos.Delete(ctx, id)
 }

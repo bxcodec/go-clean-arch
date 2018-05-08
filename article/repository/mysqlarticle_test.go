@@ -1,6 +1,7 @@
 package repository_test
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -26,7 +27,7 @@ func TestFetch(t *testing.T) {
 	a := articleRepo.NewMysqlArticleRepository(db)
 	cursor := "sampleCursor"
 	num := int64(5)
-	list, err := a.Fetch(cursor, num)
+	list, err := a.Fetch(context.TODO(), cursor, num)
 	assert.NoError(t, err)
 	assert.Len(t, list, 2)
 }
@@ -46,7 +47,7 @@ func TestGetByID(t *testing.T) {
 	a := articleRepo.NewMysqlArticleRepository(db)
 
 	num := int64(5)
-	anArticle, err := a.GetByID(num)
+	anArticle, err := a.GetByID(context.TODO(), num)
 	assert.NoError(t, err)
 	assert.NotNil(t, anArticle)
 }
@@ -75,7 +76,7 @@ func TestStore(t *testing.T) {
 
 	a := articleRepo.NewMysqlArticleRepository(db)
 
-	lastId, err := a.Store(ar)
+	lastId, err := a.Store(context.TODO(), ar)
 	assert.NoError(t, err)
 	assert.Equal(t, int64(12), lastId)
 }
@@ -95,7 +96,7 @@ func TestGetByTitle(t *testing.T) {
 	a := articleRepo.NewMysqlArticleRepository(db)
 
 	title := "title 1"
-	anArticle, err := a.GetByTitle(title)
+	anArticle, err := a.GetByTitle(context.TODO(), title)
 	assert.NoError(t, err)
 	assert.NotNil(t, anArticle)
 }
@@ -115,7 +116,7 @@ func TestDelete(t *testing.T) {
 	a := articleRepo.NewMysqlArticleRepository(db)
 
 	num := int64(12)
-	anArticleStatus, err := a.Delete(num)
+	anArticleStatus, err := a.Delete(context.TODO(), num)
 	assert.NoError(t, err)
 	assert.True(t, anArticleStatus)
 }
@@ -147,7 +148,7 @@ func TestUpdate(t *testing.T) {
 
 	a := articleRepo.NewMysqlArticleRepository(db)
 
-	s, err := a.Update(ar)
+	s, err := a.Update(context.TODO(), ar)
 	assert.NoError(t, err)
 	assert.NotNil(t, s)
 }

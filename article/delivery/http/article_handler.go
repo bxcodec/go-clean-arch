@@ -1,6 +1,7 @@
 package http
 
 import (
+	"context"
 	"net/http"
 	"strconv"
 
@@ -14,6 +15,9 @@ import (
 	validator "gopkg.in/go-playground/validator.v9"
 )
 
+type ResponseError struct {
+	Message string `json:"message"`
+}
 type HttpArticleHandler struct {
 	AUsecase articleUcase.ArticleUsecase
 }
@@ -22,13 +26,15 @@ func (a *HttpArticleHandler) FetchArticle(c echo.Context) error {
 
 	numS := c.QueryParam("num")
 	num, _ := strconv.Atoi(numS)
-
 	cursor := c.QueryParam("cursor")
-
-	listAr, nextCursor, err := a.AUsecase.Fetch(cursor, int64(num))
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	listAr, nextCursor, err := a.AUsecase.Fetch(ctx, cursor, int64(num))
 
 	if err != nil {
-		return c.JSON(getStatusCode(err), err.Error())
+		return c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
 	}
 	c.Response().Header().Set(`X-Cursor`, nextCursor)
 	return c.JSON(http.StatusOK, listAr)
@@ -39,10 +45,15 @@ func (a *HttpArticleHandler) GetByID(c echo.Context) error {
 	idP, err := strconv.Atoi(c.Param("id"))
 	id := int64(idP)
 
-	art, err := a.AUsecase.GetByID(id)
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	art, err := a.AUsecase.GetByID(ctx, id)
 
 	if err != nil {
-		return c.JSON(getStatusCode(err), err.Error())
+		return c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
 	}
 	return c.JSON(http.StatusOK, art)
 }
@@ -68,23 +79,31 @@ func (a *HttpArticleHandler) Store(c echo.Context) error {
 	if ok, err := isRequestValid(&article); !ok {
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
 
-	ar, err := a.AUsecase.Store(&article)
+	ar, err := a.AUsecase.Store(ctx, &article)
 
 	if err != nil {
-		return c.JSON(getStatusCode(err), err.Error())
+		return c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
 	}
 	return c.JSON(http.StatusCreated, ar)
 }
 func (a *HttpArticleHandler) Delete(c echo.Context) error {
 	idP, err := strconv.Atoi(c.Param("id"))
 	id := int64(idP)
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
 
-	_, err = a.AUsecase.Delete(id)
+	_, err = a.AUsecase.Delete(ctx, id)
 
 	if err != nil {
 
-		return c.JSON(getStatusCode(err), err.Error())
+		return c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
 	}
 	return c.NoContent(http.StatusNoContent)
 }
@@ -113,7 +132,6 @@ func NewArticleHttpHandler(e *echo.Echo, us articleUcase.ArticleUsecase) {
 	handler := &HttpArticleHandler{
 		AUsecase: us,
 	}
-
 	e.GET("/article", handler.FetchArticle)
 	e.POST("/article", handler.Store)
 	e.GET("/article/:id", handler.GetByID)
