@@ -1,6 +1,7 @@
 package repository_test
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -26,7 +27,7 @@ func TestGetByID(t *testing.T) {
 
 	a := repository.NewMysqlAuthorRepository(db)
 
-	anArticle, err := a.GetByID(userID)
+	anArticle, err := a.GetByID(context.TODO(), userID)
 	assert.NoError(t, err)
 	assert.NotNil(t, anArticle)
 }

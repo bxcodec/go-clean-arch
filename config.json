@@ -3,11 +3,14 @@
   "server": {
     "address": ":9090"
   },
+  "context":{
+    "timeout":2
+  },
   "database": {
       "host": "localhost",
-      "port": "33061",
+      "port": "3306",
       "user": "root",
-      "pass": "password",
+      "pass": "pass",
       "name": "article"
   }
 

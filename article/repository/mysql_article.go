@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 
@@ -21,9 +22,9 @@ func NewMysqlArticleRepository(Conn *sql.DB) article.ArticleRepository {
 	return &mysqlArticleRepository{Conn}
 }
 
-func (m *mysqlArticleRepository) fetch(query string, args ...interface{}) ([]*models.Article, error) {
+func (m *mysqlArticleRepository) fetch(ctx context.Context, query string, args ...interface{}) ([]*models.Article, error) {
 
-	rows, err := m.Conn.Query(query, args...)
+	rows, err := m.Conn.QueryContext(ctx, query, args...)
 
 	if err != nil {
 		logrus.Error(err)
@@ -56,19 +57,19 @@ func (m *mysqlArticleRepository) fetch(query string, args ...interface{}) ([]*mo
 	return result, nil
 }
 
-func (m *mysqlArticleRepository) Fetch(cursor string, num int64) ([]*models.Article, error) {
+func (m *mysqlArticleRepository) Fetch(ctx context.Context, cursor string, num int64) ([]*models.Article, error) {
 
 	query := `SELECT id,title,content, author_id, updated_at, created_at
   						FROM article WHERE ID > ? LIMIT ?`
 
-	return m.fetch(query, cursor, num)
+	return m.fetch(ctx, query, cursor, num)
 
 }
-func (m *mysqlArticleRepository) GetByID(id int64) (*models.Article, error) {
+func (m *mysqlArticleRepository) GetByID(ctx context.Context, id int64) (*models.Article, error) {
 	query := `SELECT id,title,content, author_id, updated_at, created_at
   						FROM article WHERE ID = ?`
 
-	list, err := m.fetch(query, id)
+	list, err := m.fetch(ctx, query, id)
 	if err != nil {
 		return nil, err
 	}
@@ -83,11 +84,11 @@ func (m *mysqlArticleRepository) GetByID(id int64) (*models.Article, error) {
 	return a, nil
 }
 
-func (m *mysqlArticleRepository) GetByTitle(title string) (*models.Article, error) {
+func (m *mysqlArticleRepository) GetByTitle(ctx context.Context, title string) (*models.Article, error) {
 	query := `SELECT id,title,content, author_id, updated_at, created_at
   						FROM article WHERE title = ?`
 
-	list, err := m.fetch(query, title)
+	list, err := m.fetch(ctx, query, title)
 	if err != nil {
 		return nil, err
 	}
@@ -101,17 +102,17 @@ func (m *mysqlArticleRepository) GetByTitle(title string) (*models.Article, erro
 	return a, nil
 }
 
-func (m *mysqlArticleRepository) Store(a *models.Article) (int64, error) {
+func (m *mysqlArticleRepository) Store(ctx context.Context, a *models.Article) (int64, error) {
 
 	query := `INSERT  article SET title=? , content=? , author_id=?, updated_at=? , created_at=?`
-	stmt, err := m.Conn.Prepare(query)
+	stmt, err := m.Conn.PrepareContext(ctx, query)
 	if err != nil {
 
 		return 0, err
 	}
 
 	logrus.Debug("Created At: ", a.CreatedAt)
-	res, err := stmt.Exec(a.Title, a.Content, a.Author.ID, a.UpdatedAt, a.CreatedAt)
+	res, err := stmt.ExecContext(ctx, a.Title, a.Content, a.Author.ID, a.UpdatedAt, a.CreatedAt)
 	if err != nil {
 
 		return 0, err
@@ -119,14 +120,14 @@ func (m *mysqlArticleRepository) Store(a *models.Article) (int64, error) {
 	return res.LastInsertId()
 }
 
-func (m *mysqlArticleRepository) Delete(id int64) (bool, error) {
+func (m *mysqlArticleRepository) Delete(ctx context.Context, id int64) (bool, error) {
 	query := "DELETE FROM article WHERE id = ?"
 
-	stmt, err := m.Conn.Prepare(query)
+	stmt, err := m.Conn.PrepareContext(ctx, query)
 	if err != nil {
 		return false, err
 	}
-	res, err := stmt.Exec(id)
+	res, err := stmt.ExecContext(ctx, id)
 	if err != nil {
 
 		return false, err
@@ -143,15 +144,15 @@ func (m *mysqlArticleRepository) Delete(id int64) (bool, error) {
 
 	return true, nil
 }
-func (m *mysqlArticleRepository) Update(ar *models.Article) (*models.Article, error) {
+func (m *mysqlArticleRepository) Update(ctx context.Context, ar *models.Article) (*models.Article, error) {
 	query := `UPDATE article set title=?, content=?, author_id=?, updated_at=? WHERE ID = ?`
 
-	stmt, err := m.Conn.Prepare(query)
+	stmt, err := m.Conn.PrepareContext(ctx, query)
 	if err != nil {
 		return nil, nil
 	}
 
-	res, err := stmt.Exec(ar.Title, ar.Content, ar.Author.ID, ar.UpdatedAt, ar.ID)
+	res, err := stmt.ExecContext(ctx, ar.Title, ar.Content, ar.Author.ID, ar.UpdatedAt, ar.ID)
 	if err != nil {
 		return nil, err
 	}

@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"context"
 	"database/sql"
 
 	"github.com/sirupsen/logrus"
@@ -20,14 +21,14 @@ func NewMysqlAuthorRepository(db *sql.DB) author.AuthorRepository {
 	}
 }
 
-func (m *mysqlAuthorRepo) getOne(query string, args ...interface{}) (*models.Author, error) {
+func (m *mysqlAuthorRepo) getOne(ctx context.Context, query string, args ...interface{}) (*models.Author, error) {
 
-	stmt, err := m.DB.Prepare(query)
+	stmt, err := m.DB.PrepareContext(ctx, query)
 	if err != nil {
 		logrus.Error(err)
 		return nil, err
 	}
-	row := stmt.QueryRow(args...)
+	row := stmt.QueryRowContext(ctx, args...)
 	a := &models.Author{}
 
 	err = row.Scan(
@@ -44,7 +45,7 @@ func (m *mysqlAuthorRepo) getOne(query string, args ...interface{}) (*models.Aut
 	return a, nil
 }
 
-func (m *mysqlAuthorRepo) GetByID(id int64) (*models.Author, error) {
+func (m *mysqlAuthorRepo) GetByID(ctx context.Context, id int64) (*models.Author, error) {
 	query := `SELECT id, name, created_at, updated_at FROM author WHERE id=?`
-	return m.getOne(query, id)
+	return m.getOne(ctx, query, id)
 }

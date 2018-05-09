@@ -1,7 +1,11 @@
 package author
 
-import "github.com/bxcodec/go-clean-arch/models"
+import (
+	"context"
+
+	"github.com/bxcodec/go-clean-arch/models"
+)
 
 type AuthorRepository interface {
-	GetByID(id int64) (*models.Author, error)
+	GetByID(ctx context.Context, id int64) (*models.Author, error)
 }
