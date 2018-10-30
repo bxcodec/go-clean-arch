@@ -1,7 +1,7 @@
 # go-clean-arch
 
 ## Looking for the old code ? 
-If you are looking for the old code, you can checkout to the [v1 branch](https://github.com/bxcodec/go-clean-archtree/v1)
+If you are looking for the old code, you can checkout to the [v1 branch](https://github.com/bxcodec/go-clean-arch/tree/v1)
 
 _Last Updated: May 12th 2018_
 
@@ -74,10 +74,10 @@ go run main.go
 ### Tools Used:
 In this project, I use some tools listed below. But you can use any simmilar library that have the same purposes. But, well, different library will have different implementation type. Just be creative and use anything that you really need. 
 
-- All libraries listed in [`Gopkg.toml`](https://github.com/bxcodec/go-clean-archblob/master/Gopkg.toml) 
+- All libraries listed in [`Gopkg.toml`](https://github.com/bxcodec/go-clean-arch/blob/master/Gopkg.toml) 
 - ["github.com/vektra/mockery".](https://github.com/vektra/mockery) To Generate Mocks for testing needs.
 
 
 ### Change log 
- - 2018-04-30 : [Move to new projects folder](https://github.com/bxcodec/go-clean-archpull/8)
- - 2018-05-09 : [Add Context](https://github.com/bxcodec/go-clean-archpull/9)
+ - 2018-04-30 : [Move to new projects folder](https://github.com/bxcodec/go-clean-arch/pull/8)
+ - 2018-05-09 : [Add Context](https://github.com/bxcodec/go-clean-arch/pull/9)
