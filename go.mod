@@ -1,4 +1,4 @@
-module github.com/bxcodec/go-clean-arch
+module github.com/bxcodec/go-clean-arch/v2
 
 require (
 	github.com/bxcodec/faker v1.4.2
