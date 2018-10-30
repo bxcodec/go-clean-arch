@@ -7,10 +7,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/bxcodec/go-clean-arch/article/mocks"
-	ucase "github.com/bxcodec/go-clean-arch/article/usecase"
-	_authorMock "github.com/bxcodec/go-clean-arch/author/mocks"
-	models "github.com/bxcodec/go-clean-arch/models"
+	"github.com/bxcodec/go-clean-arch/v2/article/mocks"
+	ucase "github.com/bxcodec/go-clean-arch/v2/article/usecase"
+	_authorMock "github.com/bxcodec/go-clean-arch/v2/author/mocks"
+	models "github.com/bxcodec/go-clean-arch/v2/models"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )

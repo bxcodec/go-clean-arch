@@ -9,9 +9,9 @@ import (
 	"testing"
 	"time"
 
-	articleHttp "github.com/bxcodec/go-clean-arch/article/delivery/http"
-	"github.com/bxcodec/go-clean-arch/article/mocks"
-	models "github.com/bxcodec/go-clean-arch/models"
+	articleHttp "github.com/bxcodec/go-clean-arch/v2/article/delivery/http"
+	"github.com/bxcodec/go-clean-arch/v2/article/mocks"
+	models "github.com/bxcodec/go-clean-arch/v2/models"
 	"github.com/labstack/echo"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"

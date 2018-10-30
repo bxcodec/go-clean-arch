@@ -5,8 +5,8 @@ import (
 	"testing"
 	"time"
 
-	articleRepo "github.com/bxcodec/go-clean-arch/article/repository"
-	models "github.com/bxcodec/go-clean-arch/models"
+	articleRepo "github.com/bxcodec/go-clean-arch/v2/article/repository"
+	models "github.com/bxcodec/go-clean-arch/v2/models"
 	"github.com/stretchr/testify/assert"
 	sqlmock "gopkg.in/DATA-DOG/go-sqlmock.v1"
 )

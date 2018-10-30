@@ -6,8 +6,8 @@ import (
 
 	"github.com/sirupsen/logrus"
 
-	"github.com/bxcodec/go-clean-arch/author"
-	"github.com/bxcodec/go-clean-arch/models"
+	"github.com/bxcodec/go-clean-arch/v2/author"
+	"github.com/bxcodec/go-clean-arch/v2/models"
 )
 
 type mysqlAuthorRepo struct {

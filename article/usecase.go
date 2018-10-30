@@ -3,7 +3,7 @@ package article
 import (
 	"context"
 
-	model "github.com/bxcodec/go-clean-arch/models"
+	model "github.com/bxcodec/go-clean-arch/v2/models"
 )
 
 type ArticleUsecase interface {

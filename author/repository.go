@@ -3,7 +3,7 @@ package author
 import (
 	"context"
 
-	"github.com/bxcodec/go-clean-arch/models"
+	"github.com/bxcodec/go-clean-arch/v2/models"
 )
 
 type AuthorRepository interface {

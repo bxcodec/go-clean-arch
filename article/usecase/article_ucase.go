@@ -5,11 +5,11 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/bxcodec/go-clean-arch/models"
+	"github.com/bxcodec/go-clean-arch/v2/models"
 	"github.com/sirupsen/logrus"
 
-	"github.com/bxcodec/go-clean-arch/article"
-	_authorRepo "github.com/bxcodec/go-clean-arch/author"
+	"github.com/bxcodec/go-clean-arch/v2/article"
+	_authorRepo "github.com/bxcodec/go-clean-arch/v2/author"
 )
 
 type articleUsecase struct {

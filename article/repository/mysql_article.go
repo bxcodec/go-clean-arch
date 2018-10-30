@@ -5,12 +5,12 @@ import (
 	"database/sql"
 	"fmt"
 
-	author "github.com/bxcodec/go-clean-arch/models"
+	author "github.com/bxcodec/go-clean-arch/v2/models"
 
 	"github.com/sirupsen/logrus"
 
-	article "github.com/bxcodec/go-clean-arch/article"
-	models "github.com/bxcodec/go-clean-arch/models"
+	article "github.com/bxcodec/go-clean-arch/v2/article"
+	models "github.com/bxcodec/go-clean-arch/v2/models"
 )
 
 type mysqlArticleRepository struct {
