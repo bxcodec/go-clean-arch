@@ -121,7 +121,7 @@ func getStatusCode(err error) int {
 		return http.StatusInternalServerError
 	case models.NOT_FOUND_ERROR:
 		return http.StatusNotFound
-	case models.CONFLIT_ERROR:
+	case models.CONFLICT_ERROR:
 		return http.StatusConflict
 	default:
 		return http.StatusInternalServerError
