@@ -162,7 +162,7 @@ func (a *articleUsecase) Store(c context.Context, m *models.Article) (*models.Ar
 	defer cancel()
 	existedArticle, _ := a.GetByTitle(ctx, m.Title)
 	if existedArticle != nil {
-		return nil, models.CONFLIT_ERROR
+		return nil, models.CONFLICT_ERROR
 	}
 
 	id, err := a.articleRepos.Store(ctx, m)
