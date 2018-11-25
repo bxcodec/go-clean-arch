@@ -23,6 +23,7 @@ type mysqlArticleRepository struct {
 	Conn *sql.DB
 }
 
+// NewMysqlArticleRepository will create an object that represent the article.Repository interface
 func NewMysqlArticleRepository(Conn *sql.DB) article.Repository {
 
 	return &mysqlArticleRepository{Conn}
