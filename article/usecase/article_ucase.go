@@ -6,21 +6,16 @@ import (
 	"time"
 
 	"github.com/bxcodec/go-clean-arch/models"
-	"github.com/sirupsen/logrus"
 
 	"github.com/bxcodec/go-clean-arch/article"
 	_authorRepo "github.com/bxcodec/go-clean-arch/author"
+	"golang.org/x/sync/errgroup"
 )
 
 type articleUsecase struct {
 	articleRepo    article.ArticleRepository
 	authorRepo     _authorRepo.AuthorRepository
 	contextTimeout time.Duration
-}
-
-type authorChanel struct {
-	Author *models.Author
-	Error  error
 }
 
 func NewArticleUsecase(a article.ArticleRepository, ar _authorRepo.AuthorRepository, timeout time.Duration) article.ArticleUsecase {
@@ -31,53 +26,53 @@ func NewArticleUsecase(a article.ArticleRepository, ar _authorRepo.AuthorReposit
 	}
 }
 
-func (a *articleUsecase) getAuthorDetail(ctx context.Context, item *models.Article, authorChan chan authorChanel) {
+/*
+* In this function below, I'm using errgroup with the pipeline pattern
+* Look how this works in this package explanation
+* in godoc: https://godoc.org/golang.org/x/sync/errgroup#ex-Group--Pipeline
+ */
+func (a *articleUsecase) getAuthorDetails(c context.Context, data []*models.Article) ([]*models.Article, error) {
 
-	res, err := a.authorRepo.GetByID(ctx, item.Author.ID)
-	holder := authorChanel{
-		Author: res,
-		Error:  err,
-	}
-	if ctx.Err() != nil {
-		return // To avoid send on closed channel
-	}
-	authorChan <- holder
-}
-func (a *articleUsecase) getAuthorDetails(ctx context.Context, data []*models.Article) ([]*models.Article, error) {
-	chAuthor := make(chan authorChanel)
-	defer close(chAuthor)
-	existingAuthorMap := make(map[int64]bool)
-	for _, item := range data {
-		if _, ok := existingAuthorMap[item.Author.ID]; !ok {
-			existingAuthorMap[item.Author.ID] = true
-			go a.getAuthorDetail(ctx, item, chAuthor)
-		}
+	g, ctx := errgroup.WithContext(c)
 
-	}
+	// Get the author's id
+	mapAuthors := map[int64]models.Author{}
 
-	mapAuthor := make(map[int64]*models.Author)
-	totalGorutineCalled := len(existingAuthorMap)
-	for i := 0; i < totalGorutineCalled; i++ {
-		select {
-		case a := <-chAuthor:
-			if a.Error == nil {
-				if a.Author != nil {
-					mapAuthor[a.Author.ID] = a.Author
-				}
-			} else {
-				return nil, a.Error
+	for _, article := range data {
+		mapAuthors[article.Author.ID] = models.Author{}
+	}
+	chanAuthor := make(chan *models.Author)
+	for authorID, _ := range mapAuthors {
+		authorID := authorID
+		g.Go(func() error {
+			res, err := a.authorRepo.GetByID(ctx, authorID)
+			if err != nil {
+				return err
 			}
+			chanAuthor <- res
+			return nil
+		})
+	}
 
-		case <-ctx.Done():
-			logrus.Warn("Timeout when calling user detail")
-			return nil, ctx.Err()
+	go func() {
+		g.Wait()
+		close(chanAuthor)
+	}()
+
+	for author := range chanAuthor {
+		if author != nil {
+			mapAuthors[author.ID] = *author
 		}
+	}
+
+	if err := g.Wait(); err != nil {
+		return nil, err
 	}
 
 	// merge the author
 	for index, item := range data {
-		if a, ok := mapAuthor[item.Author.ID]; ok {
-			data[index].Author = *a
+		if a, ok := mapAuthors[item.Author.ID]; ok {
+			data[index].Author = a
 		}
 	}
 	return data, nil

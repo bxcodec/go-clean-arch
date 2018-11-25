@@ -22,6 +22,17 @@ type HttpArticleHandler struct {
 	AUsecase articleUcase.ArticleUsecase
 }
 
+func NewArticleHttpHandler(e *echo.Echo, us articleUcase.ArticleUsecase) {
+	handler := &HttpArticleHandler{
+		AUsecase: us,
+	}
+	e.GET("/article", handler.FetchArticle)
+	e.POST("/article", handler.Store)
+	e.GET("/article/:id", handler.GetByID)
+	e.DELETE("/article/:id", handler.Delete)
+
+}
+
 func (a *HttpArticleHandler) FetchArticle(c echo.Context) error {
 
 	numS := c.QueryParam("num")
@@ -91,6 +102,7 @@ func (a *HttpArticleHandler) Store(c echo.Context) error {
 	}
 	return c.JSON(http.StatusCreated, ar)
 }
+
 func (a *HttpArticleHandler) Delete(c echo.Context) error {
 	idP, err := strconv.Atoi(c.Param("id"))
 	id := int64(idP)
@@ -113,11 +125,9 @@ func getStatusCode(err error) int {
 	if err == nil {
 		return http.StatusOK
 	}
-
 	logrus.Error(err)
 	switch err {
 	case models.INTERNAL_SERVER_ERROR:
-
 		return http.StatusInternalServerError
 	case models.NOT_FOUND_ERROR:
 		return http.StatusNotFound
@@ -126,15 +136,4 @@ func getStatusCode(err error) int {
 	default:
 		return http.StatusInternalServerError
 	}
-}
-
-func NewArticleHttpHandler(e *echo.Echo, us articleUcase.ArticleUsecase) {
-	handler := &HttpArticleHandler{
-		AUsecase: us,
-	}
-	e.GET("/article", handler.FetchArticle)
-	e.POST("/article", handler.Store)
-	e.GET("/article/:id", handler.GetByID)
-	e.DELETE("/article/:id", handler.Delete)
-
 }
