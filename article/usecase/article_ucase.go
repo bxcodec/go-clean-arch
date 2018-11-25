@@ -13,7 +13,7 @@ import (
 )
 
 type articleUsecase struct {
-	articleRepos   article.ArticleRepository
+	articleRepo    article.ArticleRepository
 	authorRepo     _authorRepo.AuthorRepository
 	contextTimeout time.Duration
 }
@@ -25,7 +25,7 @@ type authorChanel struct {
 
 func NewArticleUsecase(a article.ArticleRepository, ar _authorRepo.AuthorRepository, timeout time.Duration) article.ArticleUsecase {
 	return &articleUsecase{
-		articleRepos:   a,
+		articleRepo:    a,
 		authorRepo:     ar,
 		contextTimeout: timeout,
 	}
@@ -91,7 +91,7 @@ func (a *articleUsecase) Fetch(c context.Context, cursor string, num int64) ([]*
 	ctx, cancel := context.WithTimeout(c, a.contextTimeout)
 	defer cancel()
 
-	listArticle, err := a.articleRepos.Fetch(ctx, cursor, num)
+	listArticle, err := a.articleRepo.Fetch(ctx, cursor, num)
 	if err != nil {
 		return nil, "", err
 	}
@@ -116,7 +116,7 @@ func (a *articleUsecase) GetByID(c context.Context, id int64) (*models.Article, 
 	ctx, cancel := context.WithTimeout(c, a.contextTimeout)
 	defer cancel()
 
-	res, err := a.articleRepos.GetByID(ctx, id)
+	res, err := a.articleRepo.GetByID(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -135,14 +135,14 @@ func (a *articleUsecase) Update(c context.Context, ar *models.Article) (*models.
 	defer cancel()
 
 	ar.UpdatedAt = time.Now()
-	return a.articleRepos.Update(ctx, ar)
+	return a.articleRepo.Update(ctx, ar)
 }
 
 func (a *articleUsecase) GetByTitle(c context.Context, title string) (*models.Article, error) {
 
 	ctx, cancel := context.WithTimeout(c, a.contextTimeout)
 	defer cancel()
-	res, err := a.articleRepos.GetByTitle(ctx, title)
+	res, err := a.articleRepo.GetByTitle(ctx, title)
 	if err != nil {
 		return nil, err
 	}
@@ -165,7 +165,7 @@ func (a *articleUsecase) Store(c context.Context, m *models.Article) (*models.Ar
 		return nil, models.CONFLICT_ERROR
 	}
 
-	id, err := a.articleRepos.Store(ctx, m)
+	id, err := a.articleRepo.Store(ctx, m)
 	if err != nil {
 		return nil, err
 	}
@@ -177,9 +177,9 @@ func (a *articleUsecase) Store(c context.Context, m *models.Article) (*models.Ar
 func (a *articleUsecase) Delete(c context.Context, id int64) (bool, error) {
 	ctx, cancel := context.WithTimeout(c, a.contextTimeout)
 	defer cancel()
-	existedArticle, _ := a.articleRepos.GetByID(ctx, id)
+	existedArticle, _ := a.articleRepo.GetByID(ctx, id)
 	if existedArticle == nil {
 		return false, models.NOT_FOUND_ERROR
 	}
-	return a.articleRepos.Delete(ctx, id)
+	return a.articleRepo.Delete(ctx, id)
 }
