@@ -12,6 +12,6 @@ type Usecase interface {
 	GetByID(ctx context.Context, id int64) (*models.Article, error)
 	Update(ctx context.Context, ar *models.Article) error
 	GetByTitle(ctx context.Context, title string) (*models.Article, error)
-	Store(context.Context, *models.Article) (*models.Article, error)
+	Store(context.Context, *models.Article) error
 	Delete(ctx context.Context, id int64) error
 }

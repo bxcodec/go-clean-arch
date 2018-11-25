@@ -145,22 +145,20 @@ func (a *articleUsecase) GetByTitle(c context.Context, title string) (*models.Ar
 	return res, nil
 }
 
-func (a *articleUsecase) Store(c context.Context, m *models.Article) (*models.Article, error) {
+func (a *articleUsecase) Store(c context.Context, m *models.Article) error {
 
 	ctx, cancel := context.WithTimeout(c, a.contextTimeout)
 	defer cancel()
 	existedArticle, _ := a.GetByTitle(ctx, m.Title)
 	if existedArticle != nil {
-		return nil, models.ErrConflict
+		return models.ErrConflict
 	}
 
-	id, err := a.articleRepo.Store(ctx, m)
+	err := a.articleRepo.Store(ctx, m)
 	if err != nil {
-		return nil, err
+		return err
 	}
-
-	m.ID = id
-	return m, nil
+	return nil
 }
 
 func (a *articleUsecase) Delete(c context.Context, id int64) error {

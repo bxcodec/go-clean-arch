@@ -119,15 +119,14 @@ func TestStore(t *testing.T) {
 		tempMockArticle := mockArticle
 		tempMockArticle.ID = 0
 		mockArticleRepo.On("GetByTitle", mock.Anything, mock.AnythingOfType("string")).Return(nil, models.ErrNotFound).Once()
-		mockArticleRepo.On("Store", mock.Anything, mock.AnythingOfType("*models.Article")).Return(mockArticle.ID, nil).Once()
+		mockArticleRepo.On("Store", mock.Anything, mock.AnythingOfType("*models.Article")).Return(nil).Once()
 
 		mockAuthorrepo := new(_authorMock.Repository)
 		u := ucase.NewArticleUsecase(mockArticleRepo, mockAuthorrepo, time.Second*2)
 
-		a, err := u.Store(context.TODO(), &tempMockArticle)
+		err := u.Store(context.TODO(), &tempMockArticle)
 
 		assert.NoError(t, err)
-		assert.NotNil(t, a)
 		assert.Equal(t, mockArticle.Title, tempMockArticle.Title)
 		mockArticleRepo.AssertExpectations(t)
 	})
@@ -143,10 +142,9 @@ func TestStore(t *testing.T) {
 
 		u := ucase.NewArticleUsecase(mockArticleRepo, mockAuthorrepo, time.Second*2)
 
-		a, err := u.Store(context.TODO(), &mockArticle)
+		err := u.Store(context.TODO(), &mockArticle)
 
 		assert.Error(t, err)
-		assert.Nil(t, a)
 		mockArticleRepo.AssertExpectations(t)
 		mockAuthorrepo.AssertExpectations(t)
 	})

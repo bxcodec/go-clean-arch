@@ -9,7 +9,7 @@ import (
 
 	models "github.com/bxcodec/go-clean-arch/models"
 
-	articleUcase "github.com/bxcodec/go-clean-arch/article"
+	article "github.com/bxcodec/go-clean-arch/article"
 	"github.com/labstack/echo"
 
 	validator "gopkg.in/go-playground/validator.v9"
@@ -19,10 +19,10 @@ type ResponseError struct {
 	Message string `json:"message"`
 }
 type HttpArticleHandler struct {
-	AUsecase articleUcase.ArticleUsecase
+	AUsecase article.Usecase
 }
 
-func NewArticleHttpHandler(e *echo.Echo, us articleUcase.ArticleUsecase) {
+func NewArticleHttpHandler(e *echo.Echo, us article.Usecase) {
 	handler := &HttpArticleHandler{
 		AUsecase: us,
 	}
@@ -95,12 +95,12 @@ func (a *HttpArticleHandler) Store(c echo.Context) error {
 		ctx = context.Background()
 	}
 
-	ar, err := a.AUsecase.Store(ctx, &article)
+	err = a.AUsecase.Store(ctx, &article)
 
 	if err != nil {
 		return c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
 	}
-	return c.JSON(http.StatusCreated, ar)
+	return c.JSON(http.StatusCreated, article)
 }
 
 func (a *HttpArticleHandler) Delete(c echo.Context) error {
@@ -111,7 +111,7 @@ func (a *HttpArticleHandler) Delete(c echo.Context) error {
 		ctx = context.Background()
 	}
 
-	_, err = a.AUsecase.Delete(ctx, id)
+	err = a.AUsecase.Delete(ctx, id)
 
 	if err != nil {
 		return c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
@@ -126,7 +126,7 @@ func getStatusCode(err error) int {
 	}
 	logrus.Error(err)
 	switch err {
-	case models.INTERNAL_SERVER_ERROR:
+	case models.ErrInternalServerError:
 		return http.StatusInternalServerError
 	case models.ErrNotFound:
 		return http.StatusNotFound

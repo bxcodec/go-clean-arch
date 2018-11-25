@@ -101,24 +101,17 @@ func (_m *Repository) GetByTitle(ctx context.Context, title string) (*models.Art
 }
 
 // Store provides a mock function with given fields: ctx, a
-func (_m *Repository) Store(ctx context.Context, a *models.Article) (int64, error) {
+func (_m *Repository) Store(ctx context.Context, a *models.Article) error {
 	ret := _m.Called(ctx, a)
 
-	var r0 int64
-	if rf, ok := ret.Get(0).(func(context.Context, *models.Article) int64); ok {
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, *models.Article) error); ok {
 		r0 = rf(ctx, a)
 	} else {
-		r0 = ret.Get(0).(int64)
+		r0 = ret.Error(0)
 	}
 
-	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, *models.Article) error); ok {
-		r1 = rf(ctx, a)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
+	return r0
 }
 
 // Update provides a mock function with given fields: ctx, ar
