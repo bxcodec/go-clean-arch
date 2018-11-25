@@ -6,7 +6,7 @@ import (
 	"time"
 
 	articleRepo "github.com/bxcodec/go-clean-arch/article/repository"
-	models "github.com/bxcodec/go-clean-arch/models"
+	"github.com/bxcodec/go-clean-arch/models"
 	"github.com/stretchr/testify/assert"
 	sqlmock "gopkg.in/DATA-DOG/go-sqlmock.v1"
 )
@@ -17,17 +17,32 @@ func TestFetch(t *testing.T) {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
 	}
 	defer db.Close()
-	rows := sqlmock.NewRows([]string{"id", "title", "content", "author_id", "updated_at", "created_at"}).
-		AddRow(1, "title 1", "Content 1", 1, time.Now(), time.Now()).
-		AddRow(2, "title 2", "Content 2", 1, time.Now(), time.Now())
 
-	query := "SELECT id,title,content, author_id, updated_at, created_at FROM article WHERE ID > \\? LIMIT \\?"
+	mockArticles := []models.Article{
+		models.Article{
+			ID: 1, Title: "title 1", Content: "content 1",
+			Author: models.Author{ID: 1}, UpdatedAt: time.Now(), CreatedAt: time.Now(),
+		},
+		models.Article{
+			ID: 2, Title: "title 2", Content: "content 2",
+			Author: models.Author{ID: 1}, UpdatedAt: time.Now(), CreatedAt: time.Now(),
+		},
+	}
+
+	rows := sqlmock.NewRows([]string{"id", "title", "content", "author_id", "updated_at", "created_at"}).
+		AddRow(mockArticles[0].ID, mockArticles[0].Title, mockArticles[0].Content,
+			mockArticles[0].Author.ID, mockArticles[0].UpdatedAt, mockArticles[0].CreatedAt).
+		AddRow(mockArticles[1].ID, mockArticles[1].Title, mockArticles[1].Content,
+			mockArticles[1].Author.ID, mockArticles[1].UpdatedAt, mockArticles[1].CreatedAt)
+
+	query := "SELECT id,title,content, author_id, updated_at, created_at FROM article WHERE created_at > \\? ORDER BY created_at LIMIT \\?"
 
 	mock.ExpectQuery(query).WillReturnRows(rows)
 	a := articleRepo.NewMysqlArticleRepository(db)
-	cursor := "sampleCursor"
-	num := int64(5)
-	list, err := a.Fetch(context.TODO(), cursor, num)
+	cursor := articleRepo.EncodeCursor(mockArticles[1].CreatedAt)
+	num := int64(2)
+	list, nextCursor, err := a.Fetch(context.TODO(), cursor, num)
+	assert.NotEmpty(t, nextCursor)
 	assert.NoError(t, err)
 	assert.Len(t, list, 2)
 }
@@ -76,9 +91,9 @@ func TestStore(t *testing.T) {
 
 	a := articleRepo.NewMysqlArticleRepository(db)
 
-	lastId, err := a.Store(context.TODO(), ar)
+	err = a.Store(context.TODO(), ar)
 	assert.NoError(t, err)
-	assert.Equal(t, int64(12), lastId)
+	assert.Equal(t, int64(12), ar.ID)
 }
 
 func TestGetByTitle(t *testing.T) {
@@ -116,9 +131,8 @@ func TestDelete(t *testing.T) {
 	a := articleRepo.NewMysqlArticleRepository(db)
 
 	num := int64(12)
-	anArticleStatus, err := a.Delete(context.TODO(), num)
+	err = a.Delete(context.TODO(), num)
 	assert.NoError(t, err)
-	assert.True(t, anArticleStatus)
 }
 
 func TestUpdate(t *testing.T) {
@@ -148,7 +162,6 @@ func TestUpdate(t *testing.T) {
 
 	a := articleRepo.NewMysqlArticleRepository(db)
 
-	s, err := a.Update(context.TODO(), ar)
+	err = a.Update(context.TODO(), ar)
 	assert.NoError(t, err)
-	assert.NotNil(t, s)
 }

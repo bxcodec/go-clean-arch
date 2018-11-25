@@ -14,7 +14,8 @@ type mysqlAuthorRepo struct {
 	DB *sql.DB
 }
 
-func NewMysqlAuthorRepository(db *sql.DB) author.AuthorRepository {
+// NewMysqlAuthorRepository will create an implementation of author.Repository
+func NewMysqlAuthorRepository(db *sql.DB) author.Repository {
 
 	return &mysqlAuthorRepo{
 		DB: db,

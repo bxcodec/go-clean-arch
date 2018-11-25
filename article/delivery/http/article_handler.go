@@ -7,19 +7,33 @@ import (
 
 	"github.com/sirupsen/logrus"
 
-	models "github.com/bxcodec/go-clean-arch/models"
+	"github.com/bxcodec/go-clean-arch/models"
 
-	articleUcase "github.com/bxcodec/go-clean-arch/article"
+	"github.com/bxcodec/go-clean-arch/article"
 	"github.com/labstack/echo"
 
 	validator "gopkg.in/go-playground/validator.v9"
 )
 
+// ResponseError represent the reseponse error struct
 type ResponseError struct {
 	Message string `json:"message"`
 }
+
+// HttpArticleHandler  represent the httphandler for article
 type HttpArticleHandler struct {
-	AUsecase articleUcase.ArticleUsecase
+	AUsecase article.Usecase
+}
+
+func NewArticleHttpHandler(e *echo.Echo, us article.Usecase) {
+	handler := &HttpArticleHandler{
+		AUsecase: us,
+	}
+	e.GET("/articles", handler.FetchArticle)
+	e.POST("/articles", handler.Store)
+	e.GET("/articles/:id", handler.GetByID)
+	e.DELETE("/articles/:id", handler.Delete)
+
 }
 
 func (a *HttpArticleHandler) FetchArticle(c echo.Context) error {
@@ -84,13 +98,14 @@ func (a *HttpArticleHandler) Store(c echo.Context) error {
 		ctx = context.Background()
 	}
 
-	ar, err := a.AUsecase.Store(ctx, &article)
+	err = a.AUsecase.Store(ctx, &article)
 
 	if err != nil {
 		return c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
 	}
-	return c.JSON(http.StatusCreated, ar)
+	return c.JSON(http.StatusCreated, article)
 }
+
 func (a *HttpArticleHandler) Delete(c echo.Context) error {
 	idP, err := strconv.Atoi(c.Param("id"))
 	id := int64(idP)
@@ -99,10 +114,9 @@ func (a *HttpArticleHandler) Delete(c echo.Context) error {
 		ctx = context.Background()
 	}
 
-	_, err = a.AUsecase.Delete(ctx, id)
+	err = a.AUsecase.Delete(ctx, id)
 
 	if err != nil {
-
 		return c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
 	}
 	return c.NoContent(http.StatusNoContent)
@@ -113,28 +127,15 @@ func getStatusCode(err error) int {
 	if err == nil {
 		return http.StatusOK
 	}
-
 	logrus.Error(err)
 	switch err {
-	case models.INTERNAL_SERVER_ERROR:
-
+	case models.ErrInternalServerError:
 		return http.StatusInternalServerError
-	case models.NOT_FOUND_ERROR:
+	case models.ErrNotFound:
 		return http.StatusNotFound
-	case models.CONFLICT_ERROR:
+	case models.ErrConflict:
 		return http.StatusConflict
 	default:
 		return http.StatusInternalServerError
 	}
-}
-
-func NewArticleHttpHandler(e *echo.Echo, us articleUcase.ArticleUsecase) {
-	handler := &HttpArticleHandler{
-		AUsecase: us,
-	}
-	e.GET("/article", handler.FetchArticle)
-	e.POST("/article", handler.Store)
-	e.GET("/article/:id", handler.GetByID)
-	e.DELETE("/article/:id", handler.Delete)
-
 }
