@@ -7,12 +7,10 @@ import (
 	"fmt"
 	"time"
 
-	author "github.com/bxcodec/go-clean-arch/models"
-
 	"github.com/sirupsen/logrus"
 
-	article "github.com/bxcodec/go-clean-arch/article"
-	models "github.com/bxcodec/go-clean-arch/models"
+	"github.com/bxcodec/go-clean-arch/article"
+	"github.com/bxcodec/go-clean-arch/models"
 )
 
 const (
@@ -55,7 +53,7 @@ func (m *mysqlArticleRepository) fetch(ctx context.Context, query string, args .
 			logrus.Error(err)
 			return nil, err
 		}
-		t.Author = author.Author{
+		t.Author = models.Author{
 			ID: authorID,
 		}
 		result = append(result, t)

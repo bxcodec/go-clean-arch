@@ -11,7 +11,7 @@ import (
 
 	articleHttp "github.com/bxcodec/go-clean-arch/article/delivery/http"
 	"github.com/bxcodec/go-clean-arch/article/mocks"
-	models "github.com/bxcodec/go-clean-arch/models"
+	"github.com/bxcodec/go-clean-arch/models"
 	"github.com/labstack/echo"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"

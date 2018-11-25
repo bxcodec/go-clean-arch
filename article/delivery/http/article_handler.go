@@ -7,9 +7,9 @@ import (
 
 	"github.com/sirupsen/logrus"
 
-	models "github.com/bxcodec/go-clean-arch/models"
+	"github.com/bxcodec/go-clean-arch/models"
 
-	article "github.com/bxcodec/go-clean-arch/article"
+	"github.com/bxcodec/go-clean-arch/article"
 	"github.com/labstack/echo"
 
 	validator "gopkg.in/go-playground/validator.v9"
