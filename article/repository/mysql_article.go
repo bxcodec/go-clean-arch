@@ -78,7 +78,7 @@ func (m *mysqlArticleRepository) GetByID(ctx context.Context, id int64) (*models
 	if len(list) > 0 {
 		a = list[0]
 	} else {
-		return nil, models.NOT_FOUND_ERROR
+		return nil, models.ErrNotFound
 	}
 
 	return a, nil
@@ -97,7 +97,7 @@ func (m *mysqlArticleRepository) GetByTitle(ctx context.Context, title string) (
 	if len(list) > 0 {
 		a = list[0]
 	} else {
-		return nil, models.NOT_FOUND_ERROR
+		return nil, models.ErrNotFound
 	}
 	return a, nil
 }

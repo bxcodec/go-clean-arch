@@ -26,10 +26,10 @@ func NewArticleHttpHandler(e *echo.Echo, us articleUcase.ArticleUsecase) {
 	handler := &HttpArticleHandler{
 		AUsecase: us,
 	}
-	e.GET("/article", handler.FetchArticle)
-	e.POST("/article", handler.Store)
-	e.GET("/article/:id", handler.GetByID)
-	e.DELETE("/article/:id", handler.Delete)
+	e.GET("/articles", handler.FetchArticle)
+	e.POST("/articles", handler.Store)
+	e.GET("/articles/:id", handler.GetByID)
+	e.DELETE("/articles/:id", handler.Delete)
 
 }
 
@@ -114,7 +114,6 @@ func (a *HttpArticleHandler) Delete(c echo.Context) error {
 	_, err = a.AUsecase.Delete(ctx, id)
 
 	if err != nil {
-
 		return c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
 	}
 	return c.NoContent(http.StatusNoContent)
@@ -129,9 +128,9 @@ func getStatusCode(err error) int {
 	switch err {
 	case models.INTERNAL_SERVER_ERROR:
 		return http.StatusInternalServerError
-	case models.NOT_FOUND_ERROR:
+	case models.ErrNotFound:
 		return http.StatusNotFound
-	case models.CONFLICT_ERROR:
+	case models.ErrConflict:
 		return http.StatusConflict
 	default:
 		return http.StatusInternalServerError
