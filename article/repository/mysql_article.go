@@ -9,8 +9,7 @@ import (
 
 	"github.com/sirupsen/logrus"
 
-	"github.com/bxcodec/go-clean-arch/article"
-	"github.com/bxcodec/go-clean-arch/models"
+	"github.com/bxcodec/go-clean-arch/domain"
 )
 
 const (
@@ -21,13 +20,13 @@ type mysqlArticleRepository struct {
 	Conn *sql.DB
 }
 
-// NewMysqlArticleRepository will create an object that represent the article.Repository interface
-func NewMysqlArticleRepository(Conn *sql.DB) article.Repository {
+// NewMysqlArticleRepository will create an object that represent the domain.ArticleRepository interface
+func NewMysqlArticleRepository(Conn *sql.DB) domain.ArticleRepository {
 
 	return &mysqlArticleRepository{Conn}
 }
 
-func (m *mysqlArticleRepository) fetch(ctx context.Context, query string, args ...interface{}) ([]*models.Article, error) {
+func (m *mysqlArticleRepository) fetch(ctx context.Context, query string, args ...interface{}) ([]domain.Article, error) {
 
 	rows, err := m.Conn.QueryContext(ctx, query, args...)
 
@@ -36,9 +35,9 @@ func (m *mysqlArticleRepository) fetch(ctx context.Context, query string, args .
 		return nil, err
 	}
 	defer rows.Close()
-	result := make([]*models.Article, 0)
+	result := make([]domain.Article, 0)
 	for rows.Next() {
-		t := new(models.Article)
+		t := domain.Article{}
 		authorID := int64(0)
 		err = rows.Scan(
 			&t.ID,
@@ -53,7 +52,7 @@ func (m *mysqlArticleRepository) fetch(ctx context.Context, query string, args .
 			logrus.Error(err)
 			return nil, err
 		}
-		t.Author = models.Author{
+		t.Author = domain.Author{
 			ID: authorID,
 		}
 		result = append(result, t)
@@ -62,14 +61,14 @@ func (m *mysqlArticleRepository) fetch(ctx context.Context, query string, args .
 	return result, nil
 }
 
-func (m *mysqlArticleRepository) Fetch(ctx context.Context, cursor string, num int64) ([]*models.Article, string, error) {
+func (m *mysqlArticleRepository) Fetch(ctx context.Context, cursor string, num int64) ([]domain.Article, string, error) {
 
 	query := `SELECT id,title,content, author_id, updated_at, created_at
   						FROM article WHERE created_at > ? ORDER BY created_at LIMIT ? `
 
 	decodedCursor, err := DecodeCursor(cursor)
 	if err != nil && cursor != "" {
-		return nil, "", models.ErrBadParamInput
+		return nil, "", domain.ErrBadParamInput
 	}
 	res, err := m.fetch(ctx, query, decodedCursor, num)
 	if err != nil {
@@ -82,44 +81,43 @@ func (m *mysqlArticleRepository) Fetch(ctx context.Context, cursor string, num i
 	return res, nextCursor, err
 
 }
-func (m *mysqlArticleRepository) GetByID(ctx context.Context, id int64) (*models.Article, error) {
+func (m *mysqlArticleRepository) GetByID(ctx context.Context, id int64) (res domain.Article, err error) {
 	query := `SELECT id,title,content, author_id, updated_at, created_at
   						FROM article WHERE ID = ?`
 
 	list, err := m.fetch(ctx, query, id)
 	if err != nil {
-		return nil, err
+		return domain.Article{}, err
 	}
 
-	a := &models.Article{}
+	res = domain.Article{}
 	if len(list) > 0 {
-		a = list[0]
+		res = list[0]
 	} else {
-		return nil, models.ErrNotFound
+		return res, domain.ErrNotFound
 	}
-
-	return a, nil
+	return
 }
 
-func (m *mysqlArticleRepository) GetByTitle(ctx context.Context, title string) (*models.Article, error) {
+func (m *mysqlArticleRepository) GetByTitle(ctx context.Context, title string) (res domain.Article, err error) {
 	query := `SELECT id,title,content, author_id, updated_at, created_at
   						FROM article WHERE title = ?`
 
 	list, err := m.fetch(ctx, query, title)
 	if err != nil {
-		return nil, err
+		return res, err
 	}
 
-	a := &models.Article{}
+	res = domain.Article{}
 	if len(list) > 0 {
-		a = list[0]
+		res = list[0]
 	} else {
-		return nil, models.ErrNotFound
+		return res, domain.ErrNotFound
 	}
-	return a, nil
+	return
 }
 
-func (m *mysqlArticleRepository) Store(ctx context.Context, a *models.Article) error {
+func (m *mysqlArticleRepository) Store(ctx context.Context, a *domain.Article) error {
 
 	query := `INSERT  article SET title=? , content=? , author_id=?, updated_at=? , created_at=?`
 	stmt, err := m.Conn.PrepareContext(ctx, query)
@@ -134,11 +132,11 @@ func (m *mysqlArticleRepository) Store(ctx context.Context, a *models.Article) e
 
 		return err
 	}
-	lastId, err := res.LastInsertId()
+	lastID, err := res.LastInsertId()
 	if err != nil {
 		return err
 	}
-	a.ID = lastId
+	a.ID = lastID
 	return nil
 }
 
@@ -165,7 +163,7 @@ func (m *mysqlArticleRepository) Delete(ctx context.Context, id int64) error {
 
 	return nil
 }
-func (m *mysqlArticleRepository) Update(ctx context.Context, ar *models.Article) error {
+func (m *mysqlArticleRepository) Update(ctx context.Context, ar *domain.Article) error {
 	query := `UPDATE article set title=?, content=?, author_id=?, updated_at=? WHERE ID = ?`
 
 	stmt, err := m.Conn.PrepareContext(ctx, query)

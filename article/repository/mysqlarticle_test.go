@@ -6,7 +6,7 @@ import (
 	"time"
 
 	articleRepo "github.com/bxcodec/go-clean-arch/article/repository"
-	"github.com/bxcodec/go-clean-arch/models"
+	"github.com/bxcodec/go-clean-arch/domain"
 	"github.com/stretchr/testify/assert"
 	sqlmock "gopkg.in/DATA-DOG/go-sqlmock.v1"
 )
@@ -18,14 +18,14 @@ func TestFetch(t *testing.T) {
 	}
 	defer db.Close()
 
-	mockArticles := []models.Article{
-		models.Article{
+	mockArticles := []domain.Article{
+		domain.Article{
 			ID: 1, Title: "title 1", Content: "content 1",
-			Author: models.Author{ID: 1}, UpdatedAt: time.Now(), CreatedAt: time.Now(),
+			Author: domain.Author{ID: 1}, UpdatedAt: time.Now(), CreatedAt: time.Now(),
 		},
-		models.Article{
+		domain.Article{
 			ID: 2, Title: "title 2", Content: "content 2",
-			Author: models.Author{ID: 1}, UpdatedAt: time.Now(), CreatedAt: time.Now(),
+			Author: domain.Author{ID: 1}, UpdatedAt: time.Now(), CreatedAt: time.Now(),
 		},
 	}
 
@@ -69,12 +69,12 @@ func TestGetByID(t *testing.T) {
 
 func TestStore(t *testing.T) {
 	now := time.Now()
-	ar := &models.Article{
+	ar := &domain.Article{
 		Title:     "Judul",
 		Content:   "Content",
 		CreatedAt: now,
 		UpdatedAt: now,
-		Author: models.Author{
+		Author: domain.Author{
 			ID:   1,
 			Name: "Iman Tumorang",
 		},
@@ -137,13 +137,13 @@ func TestDelete(t *testing.T) {
 
 func TestUpdate(t *testing.T) {
 	now := time.Now()
-	ar := &models.Article{
+	ar := &domain.Article{
 		ID:        12,
 		Title:     "Judul",
 		Content:   "Content",
 		CreatedAt: now,
 		UpdatedAt: now,
-		Author: models.Author{
+		Author: domain.Author{
 			ID:   1,
 			Name: "Iman Tumorang",
 		},

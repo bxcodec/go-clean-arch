@@ -7,9 +7,7 @@ import (
 
 	"github.com/sirupsen/logrus"
 
-	"github.com/bxcodec/go-clean-arch/models"
-
-	"github.com/bxcodec/go-clean-arch/article"
+	"github.com/bxcodec/go-clean-arch/domain"
 	"github.com/labstack/echo"
 
 	validator "gopkg.in/go-playground/validator.v9"
@@ -22,10 +20,10 @@ type ResponseError struct {
 
 // HttpArticleHandler  represent the httphandler for article
 type HttpArticleHandler struct {
-	AUsecase article.Usecase
+	AUsecase domain.ArticleUsecase
 }
 
-func NewArticleHttpHandler(e *echo.Echo, us article.Usecase) {
+func NewArticleHttpHandler(e *echo.Echo, us domain.ArticleUsecase) {
 	handler := &HttpArticleHandler{
 		AUsecase: us,
 	}
@@ -72,7 +70,7 @@ func (a *HttpArticleHandler) GetByID(c echo.Context) error {
 	return c.JSON(http.StatusOK, art)
 }
 
-func isRequestValid(m *models.Article) (bool, error) {
+func isRequestValid(m *domain.Article) (bool, error) {
 
 	validate := validator.New()
 
@@ -84,7 +82,7 @@ func isRequestValid(m *models.Article) (bool, error) {
 }
 
 func (a *HttpArticleHandler) Store(c echo.Context) error {
-	var article models.Article
+	var article domain.Article
 	err := c.Bind(&article)
 	if err != nil {
 		return c.JSON(http.StatusUnprocessableEntity, err.Error())
@@ -129,11 +127,11 @@ func getStatusCode(err error) int {
 	}
 	logrus.Error(err)
 	switch err {
-	case models.ErrInternalServerError:
+	case domain.ErrInternalServerError:
 		return http.StatusInternalServerError
-	case models.ErrNotFound:
+	case domain.ErrNotFound:
 		return http.StatusNotFound
-	case models.ErrConflict:
+	case domain.ErrConflict:
 		return http.StatusConflict
 	default:
 		return http.StatusInternalServerError
