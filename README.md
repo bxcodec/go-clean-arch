@@ -30,6 +30,7 @@ This project has  4 Domain layer :
 The explanation about this project's structure  can read from this medium's post : https://medium.com/@imantumorang/golang-clean-archithecture-efd6d7c43047
 
 ### How To Run This Project
+> Make Sure you have run the article.sql in your mysql
 
 ```bash
 #move to directory
@@ -51,8 +52,8 @@ make
 go run main.go
 
 ```
-
-Or
+Or With `go get`
+> Make Sure you have run the article.sql in your mysql
 
 ```bash
 # GET WITH GO GET
@@ -72,8 +73,33 @@ make
 go run main.go
 ```
 
+Or with `docker-compose`
 
-> Make Sure you have run the article.sql in your mysql
+```bash
+#move to directory
+cd $GOPATH/src/github.com/bxcodec
+
+# Clone into YOUR $GOPATH/src
+git clone https://github.com/bxcodec/go-clean-arch.git
+
+#move to project
+cd go-clean-arch
+
+# Build the docker image first
+make docker
+# Run the application
+make run
+
+# check if the containers are running
+docker ps
+
+# Execute the call
+curl localhost:9090/articles
+
+# Stop
+make stop
+```
+
 
 ### Tools Used:
 In this project, I use some tools listed below. But you can use any simmilar library that have the same purposes. But, well, different library will have different implementation type. Just be creative and use anything that you really need. 

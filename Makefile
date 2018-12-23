@@ -1,19 +1,29 @@
-BINARY=article_clean
-TESTS=go test $$(go list ./... | grep -v /vendor/) -cover
+BINARY=engine
+test: 
+	go test -v -cover -covermode=atomic ./...
 
-build:
-	${TESTS}
+vendor:
+	@dep ensure -v
+
+engine: vendor
 	go build -o ${BINARY}
 
-install:
-	${TESTS}
+install: 
 	go build -o ${BINARY}
 
 unittest:
 	go test -short $$(go list ./... | grep -v /vendor/)
 
-
 clean:
 	if [ -f ${BINARY} ] ; then rm ${BINARY} ; fi
 
-.PHONY: clean install unittest
+docker:
+	docker build -t go-clean-arch .
+
+run:
+	docker-compose up -d
+
+stop:
+	docker-compose down
+
+.PHONY: clean install unittest build docker run stop vendor

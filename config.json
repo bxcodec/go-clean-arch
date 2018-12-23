@@ -7,10 +7,10 @@
     "timeout":2
   },
   "database": {
-      "host": "localhost",
-      "port": "33060",
-      "user": "root",
-      "pass": "root",
+      "host": "mysql",
+      "port": "3306",
+      "user": "user",
+      "pass": "password",
       "name": "article"
   }
 
