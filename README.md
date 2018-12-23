@@ -31,6 +31,7 @@ The explanation about this project's structure  can read from this medium's post
 
 ### How To Run This Project
 > Make Sure you have run the article.sql in your mysql
+
 ```bash
 #move to directory
 cd $GOPATH/src/github.com/bxcodec
@@ -51,7 +52,7 @@ make
 go run main.go
 
 ```
-Or With Go Get
+Or With `go get`
 > Make Sure you have run the article.sql in your mysql
 
 ```bash
@@ -72,7 +73,7 @@ make
 go run main.go
 ```
 
-Or with docker-compose
+Or with `docker-compose`
 
 ```bash
 #move to directory

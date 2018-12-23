@@ -15,7 +15,7 @@ RUN make engine
 FROM alpine:latest
 
 RUN apk update && apk upgrade && \
-    apk --update add git make tzdata && \
+    apk --update tzdata && \
     mkdir /app 
 
 WORKDIR /app 
