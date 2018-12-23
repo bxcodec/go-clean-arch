@@ -96,13 +96,13 @@ func (_m *ArticleRepository) GetByTitle(ctx context.Context, title string) (doma
 	return r0, r1
 }
 
-// Store provides a mock function with given fields: ctx, a
-func (_m *ArticleRepository) Store(ctx context.Context, a *domain.Article) error {
-	ret := _m.Called(ctx, a)
+// Store provides a mock function with given fields: _a0, _a1
+func (_m *ArticleRepository) Store(_a0 context.Context, _a1 *domain.Article) error {
+	ret := _m.Called(_a0, _a1)
 
 	var r0 error
 	if rf, ok := ret.Get(0).(func(context.Context, *domain.Article) error); ok {
-		r0 = rf(ctx, a)
+		r0 = rf(_a0, _a1)
 	} else {
 		r0 = ret.Error(0)
 	}
