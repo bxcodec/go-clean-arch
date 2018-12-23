@@ -6,10 +6,10 @@ vendor:
 	@dep ensure -v
 
 engine: vendor
-	go build -o ${BINARY}
+	go build -o ${BINARY} app/*.go
 
 install: 
-	go build -o ${BINARY}
+	go build -o ${BINARY} app/*.go
 
 unittest:
 	go test -short $$(go list ./... | grep -v /vendor/)
