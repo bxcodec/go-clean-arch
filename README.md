@@ -71,7 +71,32 @@ make
 # Run Project
 go run main.go
 ```
+Or with docker-compose
 
+```bash
+#move to directory
+cd $GOPATH/src/github.com/bxcodec
+
+# Clone into YOUR $GOPATH/src
+git clone https://github.com/bxcodec/go-clean-arch.git
+
+#move to project
+cd go-clean-arch
+
+# Build the docker image first
+make docker
+# Run the application
+make run
+
+# check if the containers are running
+docker ps
+
+# Execute the call
+curl localhost:9090/articles
+
+# Stop
+make stop
+```
 
 > Make Sure you have run the article.sql in your mysql
 

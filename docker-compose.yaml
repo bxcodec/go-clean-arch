@@ -1,0 +1,25 @@
+version: "2.3"
+services:
+  web:
+    image: go-clean-arch
+    container_name: article_management_api
+    ports:
+      - 9090:9090
+    depends_on:
+      - mysql
+    volumes:
+      - ./config.json:/app/config.json
+  mysql:
+    image: mysql:5.7 
+    container_name: go_clean_arch_mysql
+    command: mysqld --user=root
+    volumes:
+      - ./article.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - 3306:3306
+    environment:
+      - MYSQL_DATABASE=article
+      - MYSQL_USER=user
+      - MYSQL_PASSWORD=password
+      - MYSQL_ROOT_PASSWORD=root
+
