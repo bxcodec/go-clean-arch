@@ -45,8 +45,8 @@ cd go-clean-arch
 # Install Dependencies
 dep ensure
 
-# Make File
-make
+# Test the code
+make test
 
 # Run Project
 go run main.go
@@ -66,8 +66,8 @@ cd $GOPATH/src/github.com/bxcodec/go-clean-arch
 # Install Dependencies
 dep ensure
 
-# Make File
-make
+# Test the code
+make test
 
 # Run Project
 go run main.go
@@ -87,6 +87,7 @@ cd go-clean-arch
 
 # Build the docker image first
 make docker
+
 # Run the application
 make run
 
