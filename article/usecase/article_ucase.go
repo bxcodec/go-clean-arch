@@ -4,6 +4,8 @@ import (
 	"context"
 	"time"
 
+	"github.com/sirupsen/logrus"
+
 	"github.com/bxcodec/go-clean-arch/models"
 
 	"github.com/bxcodec/go-clean-arch/article"
@@ -43,7 +45,7 @@ func (a *articleUsecase) fillAuthorDetails(c context.Context, data []*models.Art
 	}
 	// Using goroutine to fetch the author's detail
 	chanAuthor := make(chan *models.Author)
-	for authorID, _ := range mapAuthors {
+	for authorID := range mapAuthors {
 		authorID := authorID
 		g.Go(func() error {
 			res, err := a.authorRepo.GetByID(ctx, authorID)
@@ -56,7 +58,11 @@ func (a *articleUsecase) fillAuthorDetails(c context.Context, data []*models.Art
 	}
 
 	go func() {
-		g.Wait()
+		err := g.Wait()
+		if err != nil {
+			logrus.Error(err)
+			return
+		}
 		close(chanAuthor)
 	}()
 

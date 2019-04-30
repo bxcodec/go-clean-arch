@@ -4,6 +4,8 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/stretchr/testify/require"
+
 	"github.com/bxcodec/go-clean-arch/middleware"
 	"github.com/labstack/echo"
 
@@ -22,7 +24,8 @@ func TestCORS(t *testing.T) {
 	h := m.CORS(echo.HandlerFunc(func(c echo.Context) error {
 		return c.NoContent(http.StatusOK)
 	}))
-	h(c)
 
+	err := h(c)
+	require.NoError(t, err)
 	assert.Equal(t, "*", res.Header().Get("Access-Control-Allow-Origin"))
 }

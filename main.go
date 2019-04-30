@@ -8,20 +8,20 @@ import (
 	"os"
 	"time"
 
+	_ "github.com/go-sql-driver/mysql"
+	"github.com/labstack/echo"
+	"github.com/spf13/viper"
+
 	_articleHttpDeliver "github.com/bxcodec/go-clean-arch/article/delivery/http"
 	_articleRepo "github.com/bxcodec/go-clean-arch/article/repository"
 	_articleUcase "github.com/bxcodec/go-clean-arch/article/usecase"
 	_authorRepo "github.com/bxcodec/go-clean-arch/author/repository"
 	"github.com/bxcodec/go-clean-arch/middleware"
-	_ "github.com/go-sql-driver/mysql"
-	"github.com/labstack/echo"
-	"github.com/spf13/viper"
 )
 
 func init() {
 	viper.SetConfigFile(`config.json`)
 	err := viper.ReadInConfig()
-
 	if err != nil {
 		panic(err)
 	}
@@ -29,11 +29,9 @@ func init() {
 	if viper.GetBool(`debug`) {
 		fmt.Println("Service RUN on DEBUG mode")
 	}
-
 }
 
 func main() {
-
 	dbHost := viper.GetString(`database.host`)
 	dbPort := viper.GetString(`database.port`)
 	dbUser := viper.GetString(`database.user`)
@@ -54,7 +52,13 @@ func main() {
 		os.Exit(1)
 	}
 
-	defer dbConn.Close()
+	defer func() {
+		err := dbConn.Close()
+		if err != nil {
+			log.Fatal(err)
+		}
+	}()
+
 	e := echo.New()
 	middL := middleware.InitMiddleware()
 	e.Use(middL.CORS)
@@ -63,7 +67,7 @@ func main() {
 
 	timeoutContext := time.Duration(viper.GetInt("context.timeout")) * time.Second
 	au := _articleUcase.NewArticleUsecase(ar, authorRepo, timeoutContext)
-	_articleHttpDeliver.NewArticleHttpHandler(e, au)
+	_articleHttpDeliver.NewArticleHandler(e, au)
 
-	e.Start(viper.GetString("server.address"))
+	log.Fatal(e.Start(viper.GetString("server.address")))
 }

@@ -4,6 +4,7 @@ import (
 	"time"
 )
 
+// Article represent the article model
 type Article struct {
 	ID        int64     `json:"id"`
 	Title     string    `json:"title" validate:"required"`

@@ -9,14 +9,15 @@ import (
 	"testing"
 	"time"
 
-	articleHttp "github.com/bxcodec/go-clean-arch/article/delivery/http"
-	"github.com/bxcodec/go-clean-arch/article/mocks"
-	"github.com/bxcodec/go-clean-arch/models"
+	"github.com/bxcodec/faker"
 	"github.com/labstack/echo"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/require"
 
-	"github.com/bxcodec/faker"
+	articleHttp "github.com/bxcodec/go-clean-arch/article/delivery/http"
+	"github.com/bxcodec/go-clean-arch/article/mocks"
+	"github.com/bxcodec/go-clean-arch/models"
 )
 
 func TestFetch(t *testing.T) {
@@ -36,14 +37,14 @@ func TestFetch(t *testing.T) {
 
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
-	handler := articleHttp.HttpArticleHandler{
+	handler := articleHttp.ArticleHandler{
 		AUsecase: mockUCase,
 	}
-	handler.FetchArticle(c)
+	err = handler.FetchArticle(c)
+	require.NoError(t, err)
 
 	responseCursor := rec.Header().Get("X-Cursor")
 	assert.Equal(t, "10", responseCursor)
-
 	assert.Equal(t, http.StatusOK, rec.Code)
 	mockUCase.AssertExpectations(t)
 }
@@ -60,14 +61,14 @@ func TestFetchError(t *testing.T) {
 
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
-	handler := articleHttp.HttpArticleHandler{
+	handler := articleHttp.ArticleHandler{
 		AUsecase: mockUCase,
 	}
-	handler.FetchArticle(c)
+	err = handler.FetchArticle(c)
+	require.NoError(t, err)
 
 	responseCursor := rec.Header().Get("X-Cursor")
 	assert.Equal(t, "", responseCursor)
-
 	assert.Equal(t, http.StatusInternalServerError, rec.Code)
 	mockUCase.AssertExpectations(t)
 }
@@ -84,7 +85,7 @@ func TestGetByID(t *testing.T) {
 	mockUCase.On("GetByID", mock.Anything, int64(num)).Return(&mockArticle, nil)
 
 	e := echo.New()
-	req, err := http.NewRequest(echo.GET, "/article/"+strconv.Itoa(int(num)), strings.NewReader(""))
+	req, err := http.NewRequest(echo.GET, "/article/"+strconv.Itoa(num), strings.NewReader(""))
 	assert.NoError(t, err)
 
 	rec := httptest.NewRecorder()
@@ -92,10 +93,11 @@ func TestGetByID(t *testing.T) {
 	c.SetPath("article/:id")
 	c.SetParamNames("id")
 	c.SetParamValues(strconv.Itoa(num))
-	handler := articleHttp.HttpArticleHandler{
+	handler := articleHttp.ArticleHandler{
 		AUsecase: mockUCase,
 	}
-	handler.GetByID(c)
+	err = handler.GetByID(c)
+	require.NoError(t, err)
 
 	assert.Equal(t, http.StatusOK, rec.Code)
 	mockUCase.AssertExpectations(t)
@@ -127,10 +129,11 @@ func TestStore(t *testing.T) {
 	c := e.NewContext(req, rec)
 	c.SetPath("/article")
 
-	handler := articleHttp.HttpArticleHandler{
+	handler := articleHttp.ArticleHandler{
 		AUsecase: mockUCase,
 	}
-	handler.Store(c)
+	err = handler.Store(c)
+	require.NoError(t, err)
 
 	assert.Equal(t, http.StatusCreated, rec.Code)
 	mockUCase.AssertExpectations(t)
@@ -148,7 +151,7 @@ func TestDelete(t *testing.T) {
 	mockUCase.On("Delete", mock.Anything, int64(num)).Return(nil)
 
 	e := echo.New()
-	req, err := http.NewRequest(echo.DELETE, "/article/"+strconv.Itoa(int(num)), strings.NewReader(""))
+	req, err := http.NewRequest(echo.DELETE, "/article/"+strconv.Itoa(num), strings.NewReader(""))
 	assert.NoError(t, err)
 
 	rec := httptest.NewRecorder()
@@ -156,10 +159,11 @@ func TestDelete(t *testing.T) {
 	c.SetPath("article/:id")
 	c.SetParamNames("id")
 	c.SetParamValues(strconv.Itoa(num))
-	handler := articleHttp.HttpArticleHandler{
+	handler := articleHttp.ArticleHandler{
 		AUsecase: mockUCase,
 	}
-	handler.Delete(c)
+	err = handler.Delete(c)
+	require.NoError(t, err)
 
 	assert.Equal(t, http.StatusNoContent, rec.Code)
 	mockUCase.AssertExpectations(t)
