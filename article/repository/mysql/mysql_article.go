@@ -20,7 +20,7 @@ func NewMysqlArticleRepository(Conn *sql.DB) domain.ArticleRepository {
 	return &mysqlArticleRepository{Conn}
 }
 
-func (m *mysqlArticleRepository) fetch(ctx context.Context, query string, args ...interface{}) ([]domain.Article, error) {
+func (m *mysqlArticleRepository) fetch(ctx context.Context, query string, args ...interface{}) (result []domain.Article, err error) {
 	rows, err := m.Conn.QueryContext(ctx, query, args...)
 	if err != nil {
 		logrus.Error(err)
@@ -34,7 +34,7 @@ func (m *mysqlArticleRepository) fetch(ctx context.Context, query string, args .
 		}
 	}()
 
-	result := make([]domain.Article, 0)
+	result = make([]domain.Article, 0)
 	for rows.Next() {
 		t := domain.Article{}
 		authorID := int64(0)
@@ -60,7 +60,7 @@ func (m *mysqlArticleRepository) fetch(ctx context.Context, query string, args .
 	return result, nil
 }
 
-func (m *mysqlArticleRepository) Fetch(ctx context.Context, cursor string, num int64) ([]domain.Article, string, error) {
+func (m *mysqlArticleRepository) Fetch(ctx context.Context, cursor string, num int64) (res []domain.Article, nextCursor string, err error) {
 	query := `SELECT id,title,content, author_id, updated_at, created_at
   						FROM article WHERE created_at > ? ORDER BY created_at LIMIT ? `
 
@@ -69,17 +69,16 @@ func (m *mysqlArticleRepository) Fetch(ctx context.Context, cursor string, num i
 		return nil, "", domain.ErrBadParamInput
 	}
 
-	res, err := m.fetch(ctx, query, decodedCursor, num)
+	res, err = m.fetch(ctx, query, decodedCursor, num)
 	if err != nil {
 		return nil, "", err
 	}
 
-	nextCursor := ""
 	if len(res) == int(num) {
 		nextCursor = repository.EncodeCursor(res[len(res)-1].CreatedAt)
 	}
 
-	return res, nextCursor, err
+	return
 }
 func (m *mysqlArticleRepository) GetByID(ctx context.Context, id int64) (res domain.Article, err error) {
 	query := `SELECT id,title,content, author_id, updated_at, created_at
@@ -116,72 +115,70 @@ func (m *mysqlArticleRepository) GetByTitle(ctx context.Context, title string) (
 	return
 }
 
-func (m *mysqlArticleRepository) Store(ctx context.Context, a *domain.Article) error {
+func (m *mysqlArticleRepository) Store(ctx context.Context, a *domain.Article) (err error) {
 	query := `INSERT  article SET title=? , content=? , author_id=?, updated_at=? , created_at=?`
 	stmt, err := m.Conn.PrepareContext(ctx, query)
 	if err != nil {
-		return err
+		return
 	}
 
 	res, err := stmt.ExecContext(ctx, a.Title, a.Content, a.Author.ID, a.UpdatedAt, a.CreatedAt)
 	if err != nil {
-		return err
+		return
 	}
 	lastID, err := res.LastInsertId()
 	if err != nil {
-		return err
+		return
 	}
 	a.ID = lastID
-	return nil
+	return
 }
 
-func (m *mysqlArticleRepository) Delete(ctx context.Context, id int64) error {
+func (m *mysqlArticleRepository) Delete(ctx context.Context, id int64) (err error) {
 	query := "DELETE FROM article WHERE id = ?"
 
 	stmt, err := m.Conn.PrepareContext(ctx, query)
 	if err != nil {
-		return err
+		return
 	}
 
 	res, err := stmt.ExecContext(ctx, id)
 	if err != nil {
-
-		return err
+		return
 	}
 
 	rowsAfected, err := res.RowsAffected()
 	if err != nil {
-		return err
+		return
 	}
 
 	if rowsAfected != 1 {
 		err = fmt.Errorf("Weird  Behaviour. Total Affected: %d", rowsAfected)
-		return err
+		return
 	}
 
-	return nil
+	return
 }
-func (m *mysqlArticleRepository) Update(ctx context.Context, ar *domain.Article) error {
+func (m *mysqlArticleRepository) Update(ctx context.Context, ar *domain.Article) (err error) {
 	query := `UPDATE article set title=?, content=?, author_id=?, updated_at=? WHERE ID = ?`
 
 	stmt, err := m.Conn.PrepareContext(ctx, query)
 	if err != nil {
-		return nil
+		return
 	}
 
 	res, err := stmt.ExecContext(ctx, ar.Title, ar.Content, ar.Author.ID, ar.UpdatedAt, ar.ID)
 	if err != nil {
-		return err
+		return
 	}
 	affect, err := res.RowsAffected()
 	if err != nil {
-		return err
+		return
 	}
 	if affect != 1 {
 		err = fmt.Errorf("Weird  Behaviour. Total Affected: %d", affect)
-
-		return err
+		return
 	}
 
-	return nil
+	return
 }

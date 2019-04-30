@@ -81,7 +81,7 @@ func (a *articleUsecase) fillAuthorDetails(c context.Context, data []domain.Arti
 	return data, nil
 }
 
-func (a *articleUsecase) Fetch(c context.Context, cursor string, num int64) ([]domain.Article, string, error) {
+func (a *articleUsecase) Fetch(c context.Context, cursor string, num int64) (res []domain.Article, nextCursor string, err error) {
 	if num == 0 {
 		num = 10
 	}
@@ -89,21 +89,19 @@ func (a *articleUsecase) Fetch(c context.Context, cursor string, num int64) ([]d
 	ctx, cancel := context.WithTimeout(c, a.contextTimeout)
 	defer cancel()
 
-	listArticle, nextCursor, err := a.articleRepo.Fetch(ctx, cursor, num)
+	res, nextCursor, err = a.articleRepo.Fetch(ctx, cursor, num)
 	if err != nil {
 		return nil, "", err
 	}
 
-	listArticle, err = a.fillAuthorDetails(ctx, listArticle)
+	res, err = a.fillAuthorDetails(ctx, res)
 	if err != nil {
-		return nil, "", err
+		nextCursor = ""
 	}
-
-	return listArticle, nextCursor, nil
+	return
 }
 
 func (a *articleUsecase) GetByID(c context.Context, id int64) (res domain.Article, err error) {
-
 	ctx, cancel := context.WithTimeout(c, a.contextTimeout)
 	defer cancel()
 
@@ -120,8 +118,7 @@ func (a *articleUsecase) GetByID(c context.Context, id int64) (res domain.Articl
 	return
 }
 
-func (a *articleUsecase) Update(c context.Context, ar *domain.Article) error {
-
+func (a *articleUsecase) Update(c context.Context, ar *domain.Article) (err error) {
 	ctx, cancel := context.WithTimeout(c, a.contextTimeout)
 	defer cancel()
 
@@ -130,7 +127,6 @@ func (a *articleUsecase) Update(c context.Context, ar *domain.Article) error {
 }
 
 func (a *articleUsecase) GetByTitle(c context.Context, title string) (res domain.Article, err error) {
-
 	ctx, cancel := context.WithTimeout(c, a.contextTimeout)
 	defer cancel()
 	res, err = a.articleRepo.GetByTitle(ctx, title)
@@ -142,13 +138,12 @@ func (a *articleUsecase) GetByTitle(c context.Context, title string) (res domain
 	if err != nil {
 		return domain.Article{}, err
 	}
-	res.Author = resAuthor
 
+	res.Author = resAuthor
 	return
 }
 
 func (a *articleUsecase) Store(c context.Context, m *domain.Article) (err error) {
-
 	ctx, cancel := context.WithTimeout(c, a.contextTimeout)
 	defer cancel()
 	existedArticle, _ := a.GetByTitle(ctx, m.Title)
@@ -160,12 +155,12 @@ func (a *articleUsecase) Store(c context.Context, m *domain.Article) (err error)
 	return
 }
 
-func (a *articleUsecase) Delete(c context.Context, id int64) error {
+func (a *articleUsecase) Delete(c context.Context, id int64) (err error) {
 	ctx, cancel := context.WithTimeout(c, a.contextTimeout)
 	defer cancel()
 	existedArticle, err := a.articleRepo.GetByID(ctx, id)
 	if err != nil {
-		return err
+		return
 	}
 	if existedArticle == (domain.Article{}) {
 		return domain.ErrNotFound

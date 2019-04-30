@@ -21,7 +21,6 @@ func NewMysqlAuthorRepository(db *sql.DB) domain.AuthorRepository {
 func (m *mysqlAuthorRepo) getOne(ctx context.Context, query string, args ...interface{}) (res domain.Author, err error) {
 	stmt, err := m.DB.PrepareContext(ctx, query)
 	if err != nil {
-
 		return domain.Author{}, err
 	}
 	row := stmt.QueryRowContext(ctx, args...)

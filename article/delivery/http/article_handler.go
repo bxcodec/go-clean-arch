@@ -9,7 +9,6 @@ import (
 	"github.com/sirupsen/logrus"
 	validator "gopkg.in/go-playground/validator.v9"
 
-	// "github.com/bxcodec/go-clean-arch/article"
 	"github.com/bxcodec/go-clean-arch/domain"
 )
 
@@ -92,13 +91,13 @@ func (a *ArticleHandler) Store(c echo.Context) error {
 	if ok, err := isRequestValid(&article); !ok {
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
+
 	ctx := c.Request().Context()
 	if ctx == nil {
 		ctx = context.Background()
 	}
 
 	err = a.AUsecase.Store(ctx, &article)
-
 	if err != nil {
 		return c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
 	}
