@@ -6,7 +6,7 @@ vendor:
 	@dep ensure -v
 
 engine: vendor
-	go build -o ${BINARY} app/*.go
+	go build -o ${BINARY} main.go
 
 unittest:
 	go test -short  ./...
