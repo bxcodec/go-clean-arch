@@ -2,16 +2,14 @@ package middleware_test
 
 import (
 	"net/http"
+	test "net/http/httptest"
 	"testing"
 
+	"github.com/labstack/echo"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/bxcodec/go-clean-arch/middleware"
-	"github.com/labstack/echo"
-
-	test "net/http/httptest"
-
-	"github.com/stretchr/testify/assert"
 )
 
 func TestCORS(t *testing.T) {

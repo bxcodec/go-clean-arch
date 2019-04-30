@@ -5,12 +5,11 @@ import (
 	"time"
 
 	"github.com/sirupsen/logrus"
-
-	"github.com/bxcodec/go-clean-arch/models"
+	"golang.org/x/sync/errgroup"
 
 	"github.com/bxcodec/go-clean-arch/article"
 	"github.com/bxcodec/go-clean-arch/author"
-	"golang.org/x/sync/errgroup"
+	"github.com/bxcodec/go-clean-arch/models"
 )
 
 type articleUsecase struct {
