@@ -5,3 +5,4 @@ _*
 *.test
 .DS_Store
 engine
+bin/
