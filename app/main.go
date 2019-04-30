@@ -13,9 +13,9 @@ import (
 	"github.com/spf13/viper"
 
 	_articleHttpDeliver "github.com/bxcodec/go-clean-arch/article/delivery/http"
-	_articleRepo "github.com/bxcodec/go-clean-arch/article/repository"
+	_articleRepo "github.com/bxcodec/go-clean-arch/article/repository/mysql"
 	_articleUcase "github.com/bxcodec/go-clean-arch/article/usecase"
-	_authorRepo "github.com/bxcodec/go-clean-arch/author/repository"
+	_authorRepo "github.com/bxcodec/go-clean-arch/author/repository/mysql"
 	"github.com/bxcodec/go-clean-arch/middleware"
 )
 

@@ -1,19 +1,14 @@
-package repository
+package mysql
 
 import (
 	"context"
 	"database/sql"
-	"encoding/base64"
 	"fmt"
-	"time"
 
 	"github.com/sirupsen/logrus"
 
+	"github.com/bxcodec/go-clean-arch/article/repository"
 	"github.com/bxcodec/go-clean-arch/domain"
-)
-
-const (
-	timeFormat = "2006-01-02T15:04:05.999Z07:00" // reduce precision from RFC3339Nano as date format
 )
 
 type mysqlArticleRepository struct {
@@ -69,7 +64,7 @@ func (m *mysqlArticleRepository) Fetch(ctx context.Context, cursor string, num i
 	query := `SELECT id,title,content, author_id, updated_at, created_at
   						FROM article WHERE created_at > ? ORDER BY created_at LIMIT ? `
 
-	decodedCursor, err := DecodeCursor(cursor)
+	decodedCursor, err := repository.DecodeCursor(cursor)
 	if err != nil && cursor != "" {
 		return nil, "", domain.ErrBadParamInput
 	}
@@ -81,7 +76,7 @@ func (m *mysqlArticleRepository) Fetch(ctx context.Context, cursor string, num i
 
 	nextCursor := ""
 	if len(res) == int(num) {
-		nextCursor = EncodeCursor(res[len(res)-1].CreatedAt)
+		nextCursor = repository.EncodeCursor(res[len(res)-1].CreatedAt)
 	}
 
 	return res, nextCursor, err
@@ -189,24 +184,4 @@ func (m *mysqlArticleRepository) Update(ctx context.Context, ar *domain.Article)
 	}
 
 	return nil
-}
-
-// DecodeCursor will decode cursor from user for mysql
-func DecodeCursor(encodedTime string) (time.Time, error) {
-	byt, err := base64.StdEncoding.DecodeString(encodedTime)
-	if err != nil {
-		return time.Time{}, err
-	}
-
-	timeString := string(byt)
-	t, err := time.Parse(timeFormat, timeString)
-
-	return t, err
-}
-
-// EncodeCursor will encode cursor from mysql to user
-func EncodeCursor(t time.Time) string {
-	timeString := t.Format(timeFormat)
-
-	return base64.StdEncoding.EncodeToString([]byte(timeString))
 }
