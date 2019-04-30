@@ -2,14 +2,14 @@ package middleware_test
 
 import (
 	"net/http"
+	test "net/http/httptest"
 	"testing"
 
-	"github.com/bxcodec/go-clean-arch/middleware"
 	"github.com/labstack/echo"
-
-	test "net/http/httptest"
-
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
+	"github.com/bxcodec/go-clean-arch/middleware"
 )
 
 func TestCORS(t *testing.T) {
@@ -22,7 +22,8 @@ func TestCORS(t *testing.T) {
 	h := m.CORS(echo.HandlerFunc(func(c echo.Context) error {
 		return c.NoContent(http.StatusOK)
 	}))
-	h(c)
 
+	err := h(c)
+	require.NoError(t, err)
 	assert.Equal(t, "*", res.Header().Get("Access-Control-Allow-Origin"))
 }

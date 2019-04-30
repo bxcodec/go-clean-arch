@@ -2,25 +2,20 @@ package middleware
 
 import "github.com/labstack/echo"
 
-const (
-	ACCESS_TOKEN_KEY = "Access-Token"
-)
-
-type goMiddleware struct {
+// GoMiddleware represent the data-struct for middleware
+type GoMiddleware struct {
 	// another stuff , may be needed by middleware
 }
 
-type responseError struct {
-	Message string `json:"message"`
-}
-
-func (m *goMiddleware) CORS(next echo.HandlerFunc) echo.HandlerFunc {
+// CORS will handle the CORS middleware
+func (m *GoMiddleware) CORS(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		c.Response().Header().Set("Access-Control-Allow-Origin", "*")
 		return next(c)
 	}
 }
 
-func InitMiddleware() *goMiddleware {
-	return &goMiddleware{}
+// InitMiddleware intialize the middleware
+func InitMiddleware() *GoMiddleware {
+	return &GoMiddleware{}
 }

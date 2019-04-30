@@ -4,9 +4,10 @@ import (
 	"context"
 	"time"
 
-	"github.com/bxcodec/go-clean-arch/domain"
-
+	"github.com/sirupsen/logrus"
 	"golang.org/x/sync/errgroup"
+
+	"github.com/bxcodec/go-clean-arch/domain"
 )
 
 type articleUsecase struct {
@@ -30,7 +31,6 @@ func NewArticleUsecase(a domain.ArticleRepository, ar domain.AuthorRepository, t
 * in godoc: https://godoc.org/golang.org/x/sync/errgroup#ex-Group--Pipeline
  */
 func (a *articleUsecase) fillAuthorDetails(c context.Context, data []domain.Article) ([]domain.Article, error) {
-
 	g, ctx := errgroup.WithContext(c)
 
 	// Get the author's id
@@ -54,7 +54,11 @@ func (a *articleUsecase) fillAuthorDetails(c context.Context, data []domain.Arti
 	}
 
 	go func() {
-		g.Wait()
+		err := g.Wait()
+		if err != nil {
+			logrus.Error(err)
+			return
+		}
 		close(chanAuthor)
 	}()
 

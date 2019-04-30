@@ -6,11 +6,12 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+
 	ucase "github.com/bxcodec/go-clean-arch/article/usecase"
 	"github.com/bxcodec/go-clean-arch/domain"
 	"github.com/bxcodec/go-clean-arch/domain/mocks"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 )
 
 func TestFetch(t *testing.T) {

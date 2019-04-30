@@ -5,9 +5,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/bxcodec/go-clean-arch/author/repository"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	sqlmock "gopkg.in/DATA-DOG/go-sqlmock.v1"
+
+	"github.com/bxcodec/go-clean-arch/author/repository"
 )
 
 func TestGetByID(t *testing.T) {
@@ -15,7 +17,12 @@ func TestGetByID(t *testing.T) {
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
 	}
-	defer db.Close()
+
+	defer func() {
+		err := db.Close()
+		require.NoError(t, err)
+	}()
+
 	rows := sqlmock.NewRows([]string{"id", "name", "updated_at", "created_at"}).
 		AddRow(1, "Iman Tumorang", time.Now(), time.Now())
 
