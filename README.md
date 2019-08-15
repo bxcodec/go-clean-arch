@@ -35,32 +35,38 @@ The explanation about this project's structure  can read from this medium's post
 
 Since the project already use Go Module, I recommend to put the source code in any folder but GOPATH.
 
+### Run the Testing
+
+```bash
+$ make test
+```
+
 Here is the steps to run it with `docker-compose`
 
 ```bash
 #move to directory
-cd workspace
+$ cd workspace
 
 # Clone into YOUR $GOPATH/src
-git clone https://github.com/bxcodec/go-clean-arch.git
+$ git clone https://github.com/bxcodec/go-clean-arch.git
 
 #move to project
-cd go-clean-arch
+$ cd go-clean-arch
 
 # Build the docker image first
-make docker
+$ make docker
 
 # Run the application
-make run
+$ make run
 
 # check if the containers are running
-docker ps
+$ docker ps
 
 # Execute the call
-curl localhost:9090/articles
+$ curl localhost:9090/articles
 
 # Stop
-make stop
+$ make stop
 ```
 
 

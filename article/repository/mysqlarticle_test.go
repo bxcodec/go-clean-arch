@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 	sqlmock "gopkg.in/DATA-DOG/go-sqlmock.v1"
 
 	articleRepo "github.com/bxcodec/go-clean-arch/article/repository"
@@ -18,11 +17,6 @@ func TestFetch(t *testing.T) {
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
 	}
-
-	defer func() {
-		err = db.Close()
-		require.NoError(t, err)
-	}()
 
 	mockArticles := []models.Article{
 		models.Article{
@@ -59,11 +53,6 @@ func TestGetByID(t *testing.T) {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
 	}
 
-	defer func() {
-		err = db.Close()
-		require.NoError(t, err)
-	}()
-
 	rows := sqlmock.NewRows([]string{"id", "title", "content", "author_id", "updated_at", "created_at"}).
 		AddRow(1, "title 1", "Content 1", 1, time.Now(), time.Now())
 
@@ -94,10 +83,6 @@ func TestStore(t *testing.T) {
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
 	}
-	defer func() {
-		err = db.Close()
-		require.NoError(t, err)
-	}()
 
 	query := "INSERT  article SET title=\\? , content=\\? , author_id=\\?, updated_at=\\? , created_at=\\?"
 	prep := mock.ExpectPrepare(query)
@@ -115,10 +100,7 @@ func TestGetByTitle(t *testing.T) {
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
 	}
-	defer func() {
-		err = db.Close()
-		require.NoError(t, err)
-	}()
+
 	rows := sqlmock.NewRows([]string{"id", "title", "content", "author_id", "updated_at", "created_at"}).
 		AddRow(1, "title 1", "Content 1", 1, time.Now(), time.Now())
 
@@ -138,10 +120,6 @@ func TestDelete(t *testing.T) {
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
 	}
-	defer func() {
-		err = db.Close()
-		require.NoError(t, err)
-	}()
 
 	query := "DELETE FROM article WHERE id = \\?"
 
@@ -173,10 +151,6 @@ func TestUpdate(t *testing.T) {
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
 	}
-	defer func() {
-		err = db.Close()
-		require.NoError(t, err)
-	}()
 
 	query := "UPDATE article set title=\\?, content=\\?, author_id=\\?, updated_at=\\? WHERE ID = \\?"
 
