@@ -6,7 +6,9 @@ services:
     ports:
       - 9090:9090
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
+
     volumes:
       - ./config.json:/app/config.json
   mysql:
@@ -22,4 +24,7 @@ services:
       - MYSQL_USER=user
       - MYSQL_PASSWORD=password
       - MYSQL_ROOT_PASSWORD=root
-
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      timeout: 5s
+      retries: 10
