@@ -2,10 +2,7 @@ BINARY=engine
 test: 
 	go test -v -cover -covermode=atomic ./...
 
-vendor:
-	@dep ensure -v
-
-engine: vendor
+engine:
 	go build -o ${BINARY} main.go
 
 unittest:
