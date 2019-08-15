@@ -35,12 +35,13 @@ The explanation about this project's structure  can read from this medium's post
 
 Since the project already use Go Module, I recommend to put the source code in any folder but GOPATH.
 
-### Run the Testing
+#### Run the Testing
 
 ```bash
 $ make test
 ```
 
+#### Run the Applications
 Here is the steps to run it with `docker-compose`
 
 ```bash
