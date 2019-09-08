@@ -7,7 +7,7 @@
     "timeout":2
   },
   "database": {
-      "host": "mysql",
+      "host": "172.23.0.1",
       "port": "3306",
       "user": "user",
       "pass": "password",

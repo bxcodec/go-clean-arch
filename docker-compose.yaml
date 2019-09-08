@@ -8,7 +8,8 @@ services:
     depends_on:
       mysql:
         condition: service_healthy
-
+    networks:
+      app_net:
     volumes:
       - ./config.json:/app/config.json
   mysql:
@@ -28,3 +29,10 @@ services:
       test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
       timeout: 5s
       retries: 10
+    networks:
+      app_net:
+networks:
+  app_net:
+    ipam:
+      config:
+        - subnet: "172.23.0.0/24"
