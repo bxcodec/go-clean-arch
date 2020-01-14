@@ -14,4 +14,5 @@ type Repository interface {
 	Update(ctx context.Context, ar *models.Article) error
 	Store(ctx context.Context, a *models.Article) error
 	Delete(ctx context.Context, id int64) error
+	WithTransaction(func(Repository)error) error
 }

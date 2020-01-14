@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"encoding/base64"
+	"errors"
 	"fmt"
 	"time"
 
@@ -11,6 +12,7 @@ import (
 
 	"github.com/bxcodec/go-clean-arch/article"
 	"github.com/bxcodec/go-clean-arch/models"
+	"github.com/bxcodec/go-clean-arch/types"
 )
 
 const (
@@ -18,7 +20,7 @@ const (
 )
 
 type mysqlArticleRepository struct {
-	Conn *sql.DB
+	Conn types.DB
 }
 
 // NewMysqlArticleRepository will create an object that represent the article.Repository interface
@@ -212,4 +214,27 @@ func EncodeCursor(t time.Time) string {
 	timeString := t.Format(timeFormat)
 
 	return base64.StdEncoding.EncodeToString([]byte(timeString))
+}
+
+func (m *mysqlArticleRepository) WithTransaction(f func(repo article.Repository) error) error {
+	if db, ok := m.Conn.(*sql.DB); ok {
+		tx, err := db.Begin()
+		if err != nil {
+			return err
+		}
+
+		defer tx.Rollback()
+
+		if err := f(&mysqlArticleRepository{Conn: tx}); err != nil {
+			return err
+		}
+
+		return tx.Commit()
+	}
+
+	if _, ok := m.Conn.(*sql.Tx); ok {
+		return f(m)
+	}
+
+	return errors.New("unknow DB type")
 }
