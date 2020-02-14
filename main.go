@@ -8,6 +8,9 @@ import (
 	"os"
 	"time"
 
+	"github.com/99designs/gqlgen/handler"
+	"github.com/bxcodec/go-clean-arch/graphql"
+
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/labstack/echo"
 	"github.com/spf13/viper"
@@ -68,6 +71,12 @@ func main() {
 	timeoutContext := time.Duration(viper.GetInt("context.timeout")) * time.Second
 	au := _articleUcase.NewArticleUsecase(ar, authorRepo, timeoutContext)
 	_articleHttpDeliver.NewArticleHandler(e, au)
+
+	e.GET("/playground", echo.WrapHandler(handler.Playground("GraphQL playground", "/query")))
+	e.POST("graphql", echo.WrapHandler(handler.GraphQL(graphql.NewExecutableSchema(graphql.Config{Resolvers: &graphql.Resolver{
+		ArticleUsecase: au,
+		// <--- other usecases here --->
+	}}))))
 
 	log.Fatal(e.Start(viper.GetString("server.address")))
 }
