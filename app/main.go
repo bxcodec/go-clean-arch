@@ -49,7 +49,6 @@ func main() {
 	err = dbConn.Ping()
 	if err != nil {
 		log.Fatal(err)
-		os.Exit(1)
 	}
 
 	defer func() {
