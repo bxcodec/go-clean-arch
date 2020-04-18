@@ -7,7 +7,7 @@
 
 - **v2**: checkout to the [v2 branch](https://github.com/bxcodec/go-clean-arch/tree/v2) <br>
   Proposed on 2018, archived to v2 branch on 2020 <br>
-  Desc: Improvement from v1. The story can be read here: https://medium.com/hackernoon/trying-clean-architecture-on-golang-2-44d615bf8fdf
+  Desc: Improvement from v1. The story can be read here: https://medium.com/@imantumorang/trying-clean-architecture-on-golang-2-44d615bf8fdf
 
 - **v3**: master branch <br>
   Proposed on 2019, merged to master on 2020. <br>
