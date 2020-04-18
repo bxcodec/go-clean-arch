@@ -28,9 +28,9 @@ func (m *mysqlArticleRepository) fetch(ctx context.Context, query string, args .
 	}
 
 	defer func() {
-		err := rows.Close()
-		if err != nil {
-			logrus.Error(err)
+		errRow := rows.Close()
+		if errRow != nil {
+			logrus.Error(errRow)
 		}
 	}()
 
@@ -153,7 +153,7 @@ func (m *mysqlArticleRepository) Delete(ctx context.Context, id int64) (err erro
 	}
 
 	if rowsAfected != 1 {
-		err = fmt.Errorf("Weird  Behaviour. Total Affected: %d", rowsAfected)
+		err = fmt.Errorf("Weird  Behavior. Total Affected: %d", rowsAfected)
 		return
 	}
 
@@ -176,7 +176,7 @@ func (m *mysqlArticleRepository) Update(ctx context.Context, ar *domain.Article)
 		return
 	}
 	if affect != 1 {
-		err = fmt.Errorf("Weird  Behaviour. Total Affected: %d", affect)
+		err = fmt.Errorf("Weird  Behavior. Total Affected: %d", affect)
 		return
 	}
 

@@ -1,7 +1,6 @@
 package http
 
 import (
-	"context"
 	"net/http"
 	"strconv"
 
@@ -39,14 +38,12 @@ func (a *ArticleHandler) FetchArticle(c echo.Context) error {
 	num, _ := strconv.Atoi(numS)
 	cursor := c.QueryParam("cursor")
 	ctx := c.Request().Context()
-	if ctx == nil {
-		ctx = context.Background()
-	}
-	listAr, nextCursor, err := a.AUsecase.Fetch(ctx, cursor, int64(num))
 
+	listAr, nextCursor, err := a.AUsecase.Fetch(ctx, cursor, int64(num))
 	if err != nil {
 		return c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
 	}
+
 	c.Response().Header().Set(`X-Cursor`, nextCursor)
 	return c.JSON(http.StatusOK, listAr)
 }
@@ -60,14 +57,12 @@ func (a *ArticleHandler) GetByID(c echo.Context) error {
 
 	id := int64(idP)
 	ctx := c.Request().Context()
-	if ctx == nil {
-		ctx = context.Background()
-	}
 
 	art, err := a.AUsecase.GetByID(ctx, id)
 	if err != nil {
 		return c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
 	}
+
 	return c.JSON(http.StatusOK, art)
 }
 
@@ -81,26 +76,24 @@ func isRequestValid(m *domain.Article) (bool, error) {
 }
 
 // Store will store the article by given request body
-func (a *ArticleHandler) Store(c echo.Context) error {
+func (a *ArticleHandler) Store(c echo.Context) (err error) {
 	var article domain.Article
-	err := c.Bind(&article)
+	err = c.Bind(&article)
 	if err != nil {
 		return c.JSON(http.StatusUnprocessableEntity, err.Error())
 	}
 
-	if ok, err := isRequestValid(&article); !ok {
+	var ok bool
+	if ok, err = isRequestValid(&article); !ok {
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
 
 	ctx := c.Request().Context()
-	if ctx == nil {
-		ctx = context.Background()
-	}
-
 	err = a.AUsecase.Store(ctx, &article)
 	if err != nil {
 		return c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
 	}
+
 	return c.JSON(http.StatusCreated, article)
 }
 
@@ -110,11 +103,9 @@ func (a *ArticleHandler) Delete(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusNotFound, domain.ErrNotFound.Error())
 	}
+
 	id := int64(idP)
 	ctx := c.Request().Context()
-	if ctx == nil {
-		ctx = context.Background()
-	}
 
 	err = a.AUsecase.Delete(ctx, id)
 	if err != nil {
@@ -128,6 +119,7 @@ func getStatusCode(err error) int {
 	if err == nil {
 		return http.StatusOK
 	}
+
 	logrus.Error(err)
 	switch err {
 	case domain.ErrInternalServerError:

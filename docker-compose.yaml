@@ -1,16 +1,18 @@
 version: "2.3"
 services:
   web:
-    image: go-clean-arch
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: article_management_api
     ports:
       - 9090:9090
     depends_on:
       mysql:
         condition: service_healthy
-
     volumes:
       - ./config.json:/app/config.json
+
   mysql:
     image: mysql:5.7 
     container_name: go_clean_arch_mysql
