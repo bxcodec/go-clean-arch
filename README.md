@@ -11,7 +11,7 @@
 
 - **v3**: master branch <br>
   Proposed on 2019, merged to master on 2020. <br>
-  Desc: Introducing Domain package, the details can be seen on this PR #21
+  Desc: Introducing Domain package, the details can be seen on this PR [#21](https://github.com/bxcodec/go-clean-arch/pull/21)
 
 ## Description
 This is an example of implementation of Clean Architecture in Go (Golang) projects.
