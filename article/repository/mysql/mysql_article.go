@@ -1,20 +1,14 @@
-package repository
+package mysql
 
 import (
 	"context"
 	"database/sql"
-	"encoding/base64"
 	"fmt"
-	"time"
 
 	"github.com/sirupsen/logrus"
 
-	"github.com/bxcodec/go-clean-arch/article"
-	"github.com/bxcodec/go-clean-arch/models"
-)
-
-const (
-	timeFormat = "2006-01-02T15:04:05.999Z07:00" // reduce precision from RFC3339Nano as date format
+	"github.com/bxcodec/go-clean-arch/article/repository"
+	"github.com/bxcodec/go-clean-arch/domain"
 )
 
 type mysqlArticleRepository struct {
@@ -22,11 +16,11 @@ type mysqlArticleRepository struct {
 }
 
 // NewMysqlArticleRepository will create an object that represent the article.Repository interface
-func NewMysqlArticleRepository(Conn *sql.DB) article.Repository {
+func NewMysqlArticleRepository(Conn *sql.DB) domain.ArticleRepository {
 	return &mysqlArticleRepository{Conn}
 }
 
-func (m *mysqlArticleRepository) fetch(ctx context.Context, query string, args ...interface{}) ([]*models.Article, error) {
+func (m *mysqlArticleRepository) fetch(ctx context.Context, query string, args ...interface{}) (result []domain.Article, err error) {
 	rows, err := m.Conn.QueryContext(ctx, query, args...)
 	if err != nil {
 		logrus.Error(err)
@@ -34,15 +28,15 @@ func (m *mysqlArticleRepository) fetch(ctx context.Context, query string, args .
 	}
 
 	defer func() {
-		err := rows.Close()
-		if err != nil {
-			logrus.Error(err)
+		errRow := rows.Close()
+		if errRow != nil {
+			logrus.Error(errRow)
 		}
 	}()
 
-	result := make([]*models.Article, 0)
+	result = make([]domain.Article, 0)
 	for rows.Next() {
-		t := new(models.Article)
+		t := domain.Article{}
 		authorID := int64(0)
 		err = rows.Scan(
 			&t.ID,
@@ -57,7 +51,7 @@ func (m *mysqlArticleRepository) fetch(ctx context.Context, query string, args .
 			logrus.Error(err)
 			return nil, err
 		}
-		t.Author = models.Author{
+		t.Author = domain.Author{
 			ID: authorID,
 		}
 		result = append(result, t)
@@ -66,46 +60,45 @@ func (m *mysqlArticleRepository) fetch(ctx context.Context, query string, args .
 	return result, nil
 }
 
-func (m *mysqlArticleRepository) Fetch(ctx context.Context, cursor string, num int64) ([]*models.Article, string, error) {
+func (m *mysqlArticleRepository) Fetch(ctx context.Context, cursor string, num int64) (res []domain.Article, nextCursor string, err error) {
 	query := `SELECT id,title,content, author_id, updated_at, created_at
   						FROM article WHERE created_at > ? ORDER BY created_at LIMIT ? `
 
-	decodedCursor, err := DecodeCursor(cursor)
+	decodedCursor, err := repository.DecodeCursor(cursor)
 	if err != nil && cursor != "" {
-		return nil, "", models.ErrBadParamInput
+		return nil, "", domain.ErrBadParamInput
 	}
 
-	res, err := m.fetch(ctx, query, decodedCursor, num)
+	res, err = m.fetch(ctx, query, decodedCursor, num)
 	if err != nil {
 		return nil, "", err
 	}
 
-	nextCursor := ""
 	if len(res) == int(num) {
-		nextCursor = EncodeCursor(res[len(res)-1].CreatedAt)
+		nextCursor = repository.EncodeCursor(res[len(res)-1].CreatedAt)
 	}
 
-	return res, nextCursor, err
+	return
 }
-func (m *mysqlArticleRepository) GetByID(ctx context.Context, id int64) (res *models.Article, err error) {
+func (m *mysqlArticleRepository) GetByID(ctx context.Context, id int64) (res domain.Article, err error) {
 	query := `SELECT id,title,content, author_id, updated_at, created_at
   						FROM article WHERE ID = ?`
 
 	list, err := m.fetch(ctx, query, id)
 	if err != nil {
-		return nil, err
+		return domain.Article{}, err
 	}
 
 	if len(list) > 0 {
 		res = list[0]
 	} else {
-		return nil, models.ErrNotFound
+		return res, domain.ErrNotFound
 	}
 
 	return
 }
 
-func (m *mysqlArticleRepository) GetByTitle(ctx context.Context, title string) (res *models.Article, err error) {
+func (m *mysqlArticleRepository) GetByTitle(ctx context.Context, title string) (res domain.Article, err error) {
 	query := `SELECT id,title,content, author_id, updated_at, created_at
   						FROM article WHERE title = ?`
 
@@ -117,99 +110,75 @@ func (m *mysqlArticleRepository) GetByTitle(ctx context.Context, title string) (
 	if len(list) > 0 {
 		res = list[0]
 	} else {
-		return nil, models.ErrNotFound
+		return res, domain.ErrNotFound
 	}
 	return
 }
 
-func (m *mysqlArticleRepository) Store(ctx context.Context, a *models.Article) error {
+func (m *mysqlArticleRepository) Store(ctx context.Context, a *domain.Article) (err error) {
 	query := `INSERT  article SET title=? , content=? , author_id=?, updated_at=? , created_at=?`
 	stmt, err := m.Conn.PrepareContext(ctx, query)
 	if err != nil {
-		return err
+		return
 	}
 
 	res, err := stmt.ExecContext(ctx, a.Title, a.Content, a.Author.ID, a.UpdatedAt, a.CreatedAt)
 	if err != nil {
-		return err
+		return
 	}
-
 	lastID, err := res.LastInsertId()
 	if err != nil {
-		return err
+		return
 	}
-
 	a.ID = lastID
-	return nil
+	return
 }
 
-func (m *mysqlArticleRepository) Delete(ctx context.Context, id int64) error {
+func (m *mysqlArticleRepository) Delete(ctx context.Context, id int64) (err error) {
 	query := "DELETE FROM article WHERE id = ?"
 
 	stmt, err := m.Conn.PrepareContext(ctx, query)
 	if err != nil {
-		return err
+		return
 	}
 
 	res, err := stmt.ExecContext(ctx, id)
 	if err != nil {
-
-		return err
+		return
 	}
 
 	rowsAfected, err := res.RowsAffected()
 	if err != nil {
-		return err
+		return
 	}
 
 	if rowsAfected != 1 {
-		err = fmt.Errorf("Weird  Behaviour. Total Affected: %d", rowsAfected)
-		return err
+		err = fmt.Errorf("Weird  Behavior. Total Affected: %d", rowsAfected)
+		return
 	}
 
-	return nil
+	return
 }
-func (m *mysqlArticleRepository) Update(ctx context.Context, ar *models.Article) error {
+func (m *mysqlArticleRepository) Update(ctx context.Context, ar *domain.Article) (err error) {
 	query := `UPDATE article set title=?, content=?, author_id=?, updated_at=? WHERE ID = ?`
 
 	stmt, err := m.Conn.PrepareContext(ctx, query)
 	if err != nil {
-		return nil
+		return
 	}
 
 	res, err := stmt.ExecContext(ctx, ar.Title, ar.Content, ar.Author.ID, ar.UpdatedAt, ar.ID)
 	if err != nil {
-		return err
+		return
 	}
 	affect, err := res.RowsAffected()
 	if err != nil {
-		return err
+		return
 	}
 	if affect != 1 {
-		err = fmt.Errorf("Weird  Behaviour. Total Affected: %d", affect)
-
-		return err
+		err = fmt.Errorf("Weird  Behavior. Total Affected: %d", affect)
+		return
 	}
 
-	return nil
-}
-
-// DecodeCursor will decode cursor from user for mysql
-func DecodeCursor(encodedTime string) (time.Time, error) {
-	byt, err := base64.StdEncoding.DecodeString(encodedTime)
-	if err != nil {
-		return time.Time{}, err
-	}
-
-	timeString := string(byt)
-	t, err := time.Parse(timeFormat, timeString)
-
-	return t, err
-}
-
-// EncodeCursor will encode cursor from mysql to user
-func EncodeCursor(t time.Time) string {
-	timeString := t.Format(timeFormat)
-
-	return base64.StdEncoding.EncodeToString([]byte(timeString))
+	return
 }

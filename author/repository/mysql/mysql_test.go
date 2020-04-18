@@ -1,4 +1,4 @@
-package repository_test
+package mysql_test
 
 import (
 	"context"
@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	sqlmock "gopkg.in/DATA-DOG/go-sqlmock.v1"
 
-	"github.com/bxcodec/go-clean-arch/author/repository"
+	repository "github.com/bxcodec/go-clean-arch/author/repository/mysql"
 )
 
 func TestGetByID(t *testing.T) {

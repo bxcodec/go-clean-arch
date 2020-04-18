@@ -16,17 +16,17 @@ import (
 	"github.com/stretchr/testify/require"
 
 	articleHttp "github.com/bxcodec/go-clean-arch/article/delivery/http"
-	"github.com/bxcodec/go-clean-arch/article/mocks"
-	"github.com/bxcodec/go-clean-arch/models"
+	"github.com/bxcodec/go-clean-arch/domain"
+	"github.com/bxcodec/go-clean-arch/domain/mocks"
 )
 
 func TestFetch(t *testing.T) {
-	var mockArticle models.Article
+	var mockArticle domain.Article
 	err := faker.FakeData(&mockArticle)
 	assert.NoError(t, err)
-	mockUCase := new(mocks.Usecase)
-	mockListArticle := make([]*models.Article, 0)
-	mockListArticle = append(mockListArticle, &mockArticle)
+	mockUCase := new(mocks.ArticleUsecase)
+	mockListArticle := make([]domain.Article, 0)
+	mockListArticle = append(mockListArticle, mockArticle)
 	num := 1
 	cursor := "2"
 	mockUCase.On("Fetch", mock.Anything, cursor, int64(num)).Return(mockListArticle, "10", nil)
@@ -50,10 +50,10 @@ func TestFetch(t *testing.T) {
 }
 
 func TestFetchError(t *testing.T) {
-	mockUCase := new(mocks.Usecase)
+	mockUCase := new(mocks.ArticleUsecase)
 	num := 1
 	cursor := "2"
-	mockUCase.On("Fetch", mock.Anything, cursor, int64(num)).Return(nil, "", models.ErrInternalServerError)
+	mockUCase.On("Fetch", mock.Anything, cursor, int64(num)).Return(nil, "", domain.ErrInternalServerError)
 
 	e := echo.New()
 	req, err := http.NewRequest(echo.GET, "/article?num=1&cursor="+cursor, strings.NewReader(""))
@@ -74,15 +74,15 @@ func TestFetchError(t *testing.T) {
 }
 
 func TestGetByID(t *testing.T) {
-	var mockArticle models.Article
+	var mockArticle domain.Article
 	err := faker.FakeData(&mockArticle)
 	assert.NoError(t, err)
 
-	mockUCase := new(mocks.Usecase)
+	mockUCase := new(mocks.ArticleUsecase)
 
 	num := int(mockArticle.ID)
 
-	mockUCase.On("GetByID", mock.Anything, int64(num)).Return(&mockArticle, nil)
+	mockUCase.On("GetByID", mock.Anything, int64(num)).Return(mockArticle, nil)
 
 	e := echo.New()
 	req, err := http.NewRequest(echo.GET, "/article/"+strconv.Itoa(num), strings.NewReader(""))
@@ -104,7 +104,7 @@ func TestGetByID(t *testing.T) {
 }
 
 func TestStore(t *testing.T) {
-	mockArticle := models.Article{
+	mockArticle := domain.Article{
 		Title:     "Title",
 		Content:   "Content",
 		CreatedAt: time.Now(),
@@ -113,12 +113,12 @@ func TestStore(t *testing.T) {
 
 	tempMockArticle := mockArticle
 	tempMockArticle.ID = 0
-	mockUCase := new(mocks.Usecase)
+	mockUCase := new(mocks.ArticleUsecase)
 
 	j, err := json.Marshal(tempMockArticle)
 	assert.NoError(t, err)
 
-	mockUCase.On("Store", mock.Anything, mock.AnythingOfType("*models.Article")).Return(nil)
+	mockUCase.On("Store", mock.Anything, mock.AnythingOfType("*domain.Article")).Return(nil)
 
 	e := echo.New()
 	req, err := http.NewRequest(echo.POST, "/article", strings.NewReader(string(j)))
@@ -140,11 +140,11 @@ func TestStore(t *testing.T) {
 }
 
 func TestDelete(t *testing.T) {
-	var mockArticle models.Article
+	var mockArticle domain.Article
 	err := faker.FakeData(&mockArticle)
 	assert.NoError(t, err)
 
-	mockUCase := new(mocks.Usecase)
+	mockUCase := new(mocks.ArticleUsecase)
 
 	num := int(mockArticle.ID)
 

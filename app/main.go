@@ -13,9 +13,9 @@ import (
 
 	_articleHttpDelivery "github.com/bxcodec/go-clean-arch/article/delivery/http"
 	_articleHttpDeliveryMiddleware "github.com/bxcodec/go-clean-arch/article/delivery/http/middleware"
-	_articleRepo "github.com/bxcodec/go-clean-arch/article/repository"
+	_articleRepo "github.com/bxcodec/go-clean-arch/article/repository/mysql"
 	_articleUcase "github.com/bxcodec/go-clean-arch/article/usecase"
-	_authorRepo "github.com/bxcodec/go-clean-arch/author/repository"
+	_authorRepo "github.com/bxcodec/go-clean-arch/author/repository/mysql"
 )
 
 func init() {
@@ -26,7 +26,7 @@ func init() {
 	}
 
 	if viper.GetBool(`debug`) {
-		fmt.Println("Service RUN on DEBUG mode")
+		log.Println("Service RUN on DEBUG mode")
 	}
 }
 
@@ -42,8 +42,9 @@ func main() {
 	val.Add("loc", "Asia/Jakarta")
 	dsn := fmt.Sprintf("%s?%s", connection, val.Encode())
 	dbConn, err := sql.Open(`mysql`, dsn)
-	if err != nil && viper.GetBool("debug") {
-		fmt.Println(err)
+
+	if err != nil {
+		log.Fatal(err)
 	}
 	err = dbConn.Ping()
 	if err != nil {
