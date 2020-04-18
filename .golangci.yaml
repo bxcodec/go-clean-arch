@@ -1,0 +1,80 @@
+govet:
+  check-shadowing: true
+  settings:
+    printf:
+      funcs:
+        - (github.com/golangci/golangci-lint/pkg/logutils.Log).Infof
+        - (github.com/golangci/golangci-lint/pkg/logutils.Log).Warnf
+        - (github.com/golangci/golangci-lint/pkg/logutils.Log).Errorf
+        - (github.com/golangci/golangci-lint/pkg/logutils.Log).Fatalf
+golint:
+  min-confidence: 0.8
+gocyclo:
+  min-complexity: 20
+maligned:
+  suggest-new: true
+dupl:
+  threshold: 100
+goconst:
+  min-len: 2
+  min-occurrences: 5
+misspell:
+  locale: US
+lll:
+  line-length: 160
+  # tab width in spaces. Default to 1.
+  tab-width: 1
+funlen:
+  lines: 120
+  statements: 50
+
+linters:
+# please, do not use `enable-all`: it's deprecated and will be removed soon.
+# inverted configuration with `enable-all` and `disable` is not scalable during updates of golangci-lint
+disable-all: true
+enable:
+  - deadcode
+  - errcheck
+  - funlen
+  - goconst
+  # - gocritic
+  - gocyclo
+  - golint
+  - gosec
+  - gosimple
+  - govet
+  - ineffassign
+  - interfacer
+  - lll
+  - misspell
+  - staticcheck
+  - structcheck
+  - typecheck
+  - unconvert
+  - unparam
+  - unused
+  - varcheck
+
+run:
+# default concurrency is a available CPU number
+concurrency: 2
+
+skip-dirs:
+  # - test/testdata_etc
+skip-files:
+  # - .*_test.go
+
+issues:
+exclude-rules:
+  - path: internal/(cache|renameio)/
+    linters:
+      - lll
+      - gochecknoinits
+      - gocyclo
+      - funlen
+  - path: .*_test.go
+    linters:
+      - funlen
+exclude-use-default: false
+exclude:
+    - should have a package comment
