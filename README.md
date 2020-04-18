@@ -1,16 +1,16 @@
 # go-clean-arch
 
 ## Changelog
-- v1: checkout to the [v1 branch](https://github.com/bxcodec/go-clean-arch/tree/v1) 
-  Proposed on 2017, archived to v1 branch on 2018
+- **v1**: checkout to the [v1 branch](https://github.com/bxcodec/go-clean-arch/tree/v1) <br>
+  Proposed on 2017, archived to v1 branch on 2018 <br>
   Desc: Initial proposal by me. The story can be read here: https://medium.com/@imantumorang/golang-clean-archithecture-efd6d7c43047
 
-- v2: checkout to the [v2 branch](https://github.com/bxcodec/go-clean-arch/tree/v2) 
-  Proposed on 2018, archived to v2 branch on 2020
+- **v2**: checkout to the [v2 branch](https://github.com/bxcodec/go-clean-arch/tree/v2) <br>
+  Proposed on 2018, archived to v2 branch on 2020 <br>
   Desc: Improvement from v1. The story can be read here: https://medium.com/hackernoon/trying-clean-architecture-on-golang-2-44d615bf8fdf
 
-- v3: master branch
-  Proposed on 2019, merged to master on 2020. 
+- **v3**: master branch <br>
+  Proposed on 2019, merged to master on 2020. <br>
   Desc: Introducing Domain package, the details can be seen on this PR #21
 
 ## Description
