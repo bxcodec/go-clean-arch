@@ -5,7 +5,6 @@ import (
 	"time"
 )
 
-// Article ...
 type Article struct {
 	ID        int64     `json:"id"`
 	Title     string    `json:"title" validate:"required"`
@@ -15,7 +14,6 @@ type Article struct {
 	CreatedAt time.Time `json:"created_at"`
 }
 
-// ArticleUsecase represent the article's usecases
 type ArticleUsecase interface {
 	Fetch(ctx context.Context, cursor string, num int64) ([]Article, string, error)
 	GetByID(ctx context.Context, id int64) (Article, error)
@@ -25,7 +23,6 @@ type ArticleUsecase interface {
 	Delete(ctx context.Context, id int64) error
 }
 
-// ArticleRepository represent the article's repository contract
 type ArticleRepository interface {
 	Fetch(ctx context.Context, cursor string, num int64) (res []Article, nextCursor string, err error)
 	GetByID(ctx context.Context, id int64) (Article, error)
