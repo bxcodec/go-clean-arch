@@ -86,8 +86,3 @@ In this project, I use some tools listed below. But you can use any simmilar lib
 
 - All libraries listed in [`go.mod`](https://github.com/bxcodec/go-clean-arch/blob/master/go.mod) 
 - ["github.com/vektra/mockery".](https://github.com/vektra/mockery) To Generate Mocks for testing needs.
-
-
-### Change log 
- - 2018-04-30 : [Move to new projects folder](https://github.com/bxcodec/go-clean-arch/pull/8)
- - 2018-05-09 : [Add Context](https://github.com/bxcodec/go-clean-arch/pull/9)
