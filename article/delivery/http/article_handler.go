@@ -11,12 +11,12 @@ import (
 	"github.com/bxcodec/go-clean-arch/domain"
 )
 
-// ResponseError represent the reseponse error struct
+// ResponseError represent the response error struct
 type ResponseError struct {
 	Message string `json:"message"`
 }
 
-// ArticleHandler  represent the httphandler for article
+// ArticleHandler  represent the http handler for article
 type ArticleHandler struct {
 	AUsecase domain.ArticleUsecase
 }
