@@ -21,7 +21,7 @@ type ArticleUsecase interface {
 	GetByID(ctx context.Context, id int64) (Article, error)
 	Update(ctx context.Context, ar *Article) error
 	GetByTitle(ctx context.Context, title string) (Article, error)
-	Store(context.Context, *Article) error
+	Store(context.Context, art *Article) error
 	Delete(ctx context.Context, id int64) error
 }
 
