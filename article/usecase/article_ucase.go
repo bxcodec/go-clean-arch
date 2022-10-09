@@ -4,10 +4,10 @@ import (
 	"context"
 	"time"
 
+	"github.com/bxcodec/go-clean-arch/domain"
+
 	"github.com/sirupsen/logrus"
 	"golang.org/x/sync/errgroup"
-
-	"github.com/bxcodec/go-clean-arch/domain"
 )
 
 type articleUsecase struct {
