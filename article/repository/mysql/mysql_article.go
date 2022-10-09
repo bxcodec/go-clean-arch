@@ -11,6 +11,9 @@ import (
 	"github.com/bxcodec/go-clean-arch/domain"
 )
 
+var _ repository.Repository = &mysqlArticleRepository{}
+var _ domain.ArticleRepository = &mysqlArticleRepository{}
+
 type mysqlArticleRepository struct {
 	Conn *sql.DB
 }
@@ -20,44 +23,12 @@ func NewMysqlArticleRepository(Conn *sql.DB) domain.ArticleRepository {
 	return &mysqlArticleRepository{Conn}
 }
 
-func (m *mysqlArticleRepository) fetch(ctx context.Context, query string, args ...interface{}) (result []domain.Article, err error) {
-	rows, err := m.Conn.QueryContext(ctx, query, args...)
-	if err != nil {
-		logrus.Error(err)
-		return nil, err
-	}
+func (m *mysqlArticleRepository) Name() string {
+	return "article_mysql_repo"
+}
 
-	defer func() {
-		errRow := rows.Close()
-		if errRow != nil {
-			logrus.Error(errRow)
-		}
-	}()
-
-	result = make([]domain.Article, 0)
-	for rows.Next() {
-		t := domain.Article{}
-		authorID := int64(0)
-		err = rows.Scan(
-			&t.ID,
-			&t.Title,
-			&t.Content,
-			&authorID,
-			&t.UpdatedAt,
-			&t.CreatedAt,
-		)
-
-		if err != nil {
-			logrus.Error(err)
-			return nil, err
-		}
-		t.Author = domain.Author{
-			ID: authorID,
-		}
-		result = append(result, t)
-	}
-
-	return result, nil
+func (m *mysqlArticleRepository) Driver() string {
+	return DriverMySQL
 }
 
 func (m *mysqlArticleRepository) Fetch(ctx context.Context, cursor string, num int64) (res []domain.Article, nextCursor string, err error) {
@@ -181,4 +152,44 @@ func (m *mysqlArticleRepository) Update(ctx context.Context, ar *domain.Article)
 	}
 
 	return
+}
+
+func (m *mysqlArticleRepository) fetch(ctx context.Context, query string, args ...interface{}) (result []domain.Article, err error) {
+	rows, err := m.Conn.QueryContext(ctx, query, args...)
+	if err != nil {
+		logrus.Error(err)
+		return nil, err
+	}
+
+	defer func() {
+		errRow := rows.Close()
+		if errRow != nil {
+			logrus.Error(errRow)
+		}
+	}()
+
+	result = make([]domain.Article, 0)
+	for rows.Next() {
+		t := domain.Article{}
+		authorID := int64(0)
+		err = rows.Scan(
+			&t.ID,
+			&t.Title,
+			&t.Content,
+			&authorID,
+			&t.UpdatedAt,
+			&t.CreatedAt,
+		)
+
+		if err != nil {
+			logrus.Error(err)
+			return nil, err
+		}
+		t.Author = domain.Author{
+			ID: authorID,
+		}
+		result = append(result, t)
+	}
+
+	return result, nil
 }

@@ -7,18 +7,32 @@ import (
 	"net/url"
 	"time"
 
+	articleHttpDelivery "github.com/bxcodec/go-clean-arch/article/delivery/http"
+	httpMiddL "github.com/bxcodec/go-clean-arch/article/delivery/http/middleware"
+	articleRepo "github.com/bxcodec/go-clean-arch/article/repository/mysql"
+	articleUcase "github.com/bxcodec/go-clean-arch/article/usecase"
+	authorRepo "github.com/bxcodec/go-clean-arch/author/repository/mysql"
+	"github.com/bxcodec/go-clean-arch/domain"
+
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/labstack/echo"
 	"github.com/spf13/viper"
-
-	_articleHttpDelivery "github.com/bxcodec/go-clean-arch/article/delivery/http"
-	_articleHttpDeliveryMiddleware "github.com/bxcodec/go-clean-arch/article/delivery/http/middleware"
-	_articleRepo "github.com/bxcodec/go-clean-arch/article/repository/mysql"
-	_articleUcase "github.com/bxcodec/go-clean-arch/article/usecase"
-	_authorRepo "github.com/bxcodec/go-clean-arch/author/repository/mysql"
 )
 
-func init() {
+func main() {
+	setupConfig()
+
+	articleUsecase := InitRepositoriesAndUsecase()
+
+	e := echo.New()
+	e.Use(httpMiddL.CORS)
+
+	articleHttpDelivery.NewArticleHandler(e, articleUsecase)
+
+	log.Fatal(e.Start(viper.GetString("server.address")))
+}
+
+func setupConfig() {
 	viper.SetConfigFile(`config.json`)
 	err := viper.ReadInConfig()
 	if err != nil {
@@ -30,7 +44,23 @@ func init() {
 	}
 }
 
-func main() {
+func InitRepositoriesAndUsecase() domain.ArticleUsecase {
+	dbConn := InitMySQL()
+	defer func() {
+		if err := dbConn.Close(); err != nil {
+			log.Fatal(err)
+		}
+	}()
+
+	authorRepo := authorRepo.NewMysqlAuthorRepository(dbConn)
+	ar := articleRepo.NewMysqlArticleRepository(dbConn)
+	timeoutContext := time.Duration(viper.GetInt("context.timeout")) * time.Second
+	au := articleUcase.NewArticleUsecase(ar, authorRepo, timeoutContext)
+
+	return au
+}
+
+func InitMySQL() *sql.DB {
 	dbHost := viper.GetString(`database.host`)
 	dbPort := viper.GetString(`database.port`)
 	dbUser := viper.GetString(`database.user`)
@@ -41,32 +71,14 @@ func main() {
 	val.Add("parseTime", "1")
 	val.Add("loc", "Asia/Jakarta")
 	dsn := fmt.Sprintf("%s?%s", connection, val.Encode())
+
 	dbConn, err := sql.Open(`mysql`, dsn)
-
 	if err != nil {
 		log.Fatal(err)
 	}
-	err = dbConn.Ping()
-	if err != nil {
+	
+	if err = dbConn.Ping(); err != nil {
 		log.Fatal(err)
 	}
-
-	defer func() {
-		err := dbConn.Close()
-		if err != nil {
-			log.Fatal(err)
-		}
-	}()
-
-	e := echo.New()
-	middL := _articleHttpDeliveryMiddleware.InitMiddleware()
-	e.Use(middL.CORS)
-	authorRepo := _authorRepo.NewMysqlAuthorRepository(dbConn)
-	ar := _articleRepo.NewMysqlArticleRepository(dbConn)
-
-	timeoutContext := time.Duration(viper.GetInt("context.timeout")) * time.Second
-	au := _articleUcase.NewArticleUsecase(ar, authorRepo, timeoutContext)
-	_articleHttpDelivery.NewArticleHandler(e, au)
-
-	log.Fatal(e.Start(viper.GetString("server.address")))
+	return dbConn
 }

@@ -1,6 +1,6 @@
 module github.com/bxcodec/go-clean-arch
 
-go 1.12
+go 1.19
 
 require (
 	github.com/BurntSushi/toml v0.3.1 // indirect
