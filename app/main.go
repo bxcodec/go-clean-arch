@@ -22,12 +22,12 @@ import (
 func main() {
 	setupConfig()
 
-	articleUsecase := InitRepositoriesAndUsecase()
+	articleUsecase := initRepositoriesAndUsecase()
 
 	e := echo.New()
 	e.Use(httpMiddL.CORS)
 
-	articleHttpDelivery.NewArticleHandler(e, articleUsecase)
+	articleHttpDelivery.RegisterHandler(e, articleUsecase)
 
 	log.Fatal(e.Start(viper.GetString("server.address")))
 }
@@ -44,8 +44,8 @@ func setupConfig() {
 	}
 }
 
-func InitRepositoriesAndUsecase() domain.ArticleUsecase {
-	dbConn := InitMySQL()
+func initRepositoriesAndUsecase() domain.ArticleUsecase {
+	dbConn := initMySQL()
 	defer func() {
 		if err := dbConn.Close(); err != nil {
 			log.Fatal(err)
@@ -60,7 +60,7 @@ func InitRepositoriesAndUsecase() domain.ArticleUsecase {
 	return au
 }
 
-func InitMySQL() *sql.DB {
+func initMySQL() *sql.DB {
 	dbHost := viper.GetString(`database.host`)
 	dbPort := viper.GetString(`database.port`)
 	dbUser := viper.GetString(`database.user`)
@@ -76,7 +76,7 @@ func InitMySQL() *sql.DB {
 	if err != nil {
 		log.Fatal(err)
 	}
-	
+
 	if err = dbConn.Ping(); err != nil {
 		log.Fatal(err)
 	}

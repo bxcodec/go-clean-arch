@@ -3,26 +3,26 @@ package http
 import (
 	"net/http"
 	"strconv"
-	
+
 	"github.com/bxcodec/go-clean-arch/domain"
 
 	"github.com/labstack/echo"
 	"github.com/sirupsen/logrus"
-	validator "gopkg.in/go-playground/validator.v9"
+	"gopkg.in/go-playground/validator.v9"
 )
 
-// ResponseError represent the reseponse error struct
+// ResponseError represent the response error struct
 type ResponseError struct {
 	Message string `json:"message"`
 }
 
-// ArticleHandler  represent the httphandler for article
+// ArticleHandler  represent the http handler for article
 type ArticleHandler struct {
 	AUsecase domain.ArticleUsecase
 }
 
-// NewArticleHandler will initialize the articles/ resources endpoint
-func NewArticleHandler(e *echo.Echo, us domain.ArticleUsecase) {
+// RegisterHandler will initialize the articles/ resources endpoint
+func RegisterHandler(e *echo.Echo, us domain.ArticleUsecase) {
 	handler := &ArticleHandler{
 		AUsecase: us,
 	}
@@ -33,13 +33,13 @@ func NewArticleHandler(e *echo.Echo, us domain.ArticleUsecase) {
 }
 
 // FetchArticle will fetch the article based on given params
-func (a *ArticleHandler) FetchArticle(c echo.Context) error {
+func (h *ArticleHandler) FetchArticle(c echo.Context) error {
 	numS := c.QueryParam("num")
 	num, _ := strconv.Atoi(numS)
 	cursor := c.QueryParam("cursor")
 	ctx := c.Request().Context()
 
-	listAr, nextCursor, err := a.AUsecase.Fetch(ctx, cursor, int64(num))
+	listAr, nextCursor, err := h.AUsecase.Fetch(ctx, cursor, int64(num))
 	if err != nil {
 		return c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
 	}
@@ -49,7 +49,7 @@ func (a *ArticleHandler) FetchArticle(c echo.Context) error {
 }
 
 // GetByID will get article by given id
-func (a *ArticleHandler) GetByID(c echo.Context) error {
+func (h *ArticleHandler) GetByID(c echo.Context) error {
 	idP, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		return c.JSON(http.StatusNotFound, domain.ErrNotFound.Error())
@@ -58,7 +58,7 @@ func (a *ArticleHandler) GetByID(c echo.Context) error {
 	id := int64(idP)
 	ctx := c.Request().Context()
 
-	art, err := a.AUsecase.GetByID(ctx, id)
+	art, err := h.AUsecase.GetByID(ctx, id)
 	if err != nil {
 		return c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
 	}
@@ -76,7 +76,7 @@ func isRequestValid(m *domain.Article) (bool, error) {
 }
 
 // Store will store the article by given request body
-func (a *ArticleHandler) Store(c echo.Context) (err error) {
+func (h *ArticleHandler) Store(c echo.Context) (err error) {
 	var article domain.Article
 	err = c.Bind(&article)
 	if err != nil {
@@ -89,7 +89,7 @@ func (a *ArticleHandler) Store(c echo.Context) (err error) {
 	}
 
 	ctx := c.Request().Context()
-	err = a.AUsecase.Store(ctx, &article)
+	err = h.AUsecase.Store(ctx, &article)
 	if err != nil {
 		return c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
 	}
@@ -98,7 +98,7 @@ func (a *ArticleHandler) Store(c echo.Context) (err error) {
 }
 
 // Delete will delete article by given param
-func (a *ArticleHandler) Delete(c echo.Context) error {
+func (h *ArticleHandler) Delete(c echo.Context) error {
 	idP, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		return c.JSON(http.StatusNotFound, domain.ErrNotFound.Error())
@@ -107,7 +107,7 @@ func (a *ArticleHandler) Delete(c echo.Context) error {
 	id := int64(idP)
 	ctx := c.Request().Context()
 
-	err = a.AUsecase.Delete(ctx, id)
+	err = h.AUsecase.Delete(ctx, id)
 	if err != nil {
 		return c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
 	}

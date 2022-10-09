@@ -11,7 +11,6 @@ import (
 	"github.com/bxcodec/go-clean-arch/domain"
 )
 
-var _ repository.Repository = &mysqlArticleRepository{}
 var _ domain.ArticleRepository = &mysqlArticleRepository{}
 
 type mysqlArticleRepository struct {
@@ -21,14 +20,6 @@ type mysqlArticleRepository struct {
 // NewMysqlArticleRepository will create an object that represent the article.Repository interface
 func NewMysqlArticleRepository(Conn *sql.DB) domain.ArticleRepository {
 	return &mysqlArticleRepository{Conn}
-}
-
-func (m *mysqlArticleRepository) Name() string {
-	return "article_mysql_repo"
-}
-
-func (m *mysqlArticleRepository) Driver() string {
-	return DriverMySQL
 }
 
 func (m *mysqlArticleRepository) Fetch(ctx context.Context, cursor string, num int64) (res []domain.Article, nextCursor string, err error) {
@@ -51,6 +42,7 @@ func (m *mysqlArticleRepository) Fetch(ctx context.Context, cursor string, num i
 
 	return
 }
+
 func (m *mysqlArticleRepository) GetByID(ctx context.Context, id int64) (res domain.Article, err error) {
 	query := `SELECT id,title,content, author_id, updated_at, created_at
   						FROM article WHERE ID = ?`

@@ -3,7 +3,7 @@ package usecase
 import (
 	"context"
 	"time"
-	
+
 	"github.com/bxcodec/go-clean-arch/domain"
 
 	"github.com/sirupsen/logrus"
