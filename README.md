@@ -52,7 +52,7 @@ Since the project already use Go Module, I recommend to put the source code in a
 #### Run the Testing
 
 ```bash
-$ make test
+$ make tests
 ```
 
 #### Run the Applications
