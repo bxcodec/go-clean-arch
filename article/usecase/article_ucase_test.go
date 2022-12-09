@@ -63,7 +63,6 @@ func TestFetch(t *testing.T) {
 		mockArticleRepo.AssertExpectations(t)
 		mockAuthorrepo.AssertExpectations(t)
 	})
-
 }
 
 func TestGetByID(t *testing.T) {
@@ -105,7 +104,6 @@ func TestGetByID(t *testing.T) {
 		mockArticleRepo.AssertExpectations(t)
 		mockAuthorrepo.AssertExpectations(t)
 	})
-
 }
 
 func TestStore(t *testing.T) {
@@ -148,7 +146,6 @@ func TestStore(t *testing.T) {
 		mockArticleRepo.AssertExpectations(t)
 		mockAuthorrepo.AssertExpectations(t)
 	})
-
 }
 
 func TestDelete(t *testing.T) {
@@ -196,7 +193,6 @@ func TestDelete(t *testing.T) {
 		mockArticleRepo.AssertExpectations(t)
 		mockAuthorrepo.AssertExpectations(t)
 	})
-
 }
 
 func TestUpdate(t *testing.T) {

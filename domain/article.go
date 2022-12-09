@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-// Article ...
+// Article is representing the Article data struct
 type Article struct {
 	ID        int64     `json:"id"`
 	Title     string    `json:"title" validate:"required"`

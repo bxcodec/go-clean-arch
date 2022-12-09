@@ -1,4 +1,4 @@
-version: "2.3"
+version: "3.7"
 services:
   web:
     build:
@@ -14,7 +14,7 @@ services:
       - ./config.json:/app/config.json
 
   mysql:
-    image: mysql:5.7 
+    image: mysql:5.7
     container_name: go_clean_arch_mysql
     command: mysqld --user=root
     volumes:
@@ -27,6 +27,6 @@ services:
       - MYSQL_PASSWORD=password
       - MYSQL_ROOT_PASSWORD=root
     healthcheck:
-      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       timeout: 5s
       retries: 10

@@ -68,5 +68,5 @@ func main() {
 	au := _articleUcase.NewArticleUsecase(ar, authorRepo, timeoutContext)
 	_articleHttpDelivery.NewArticleHandler(e, au)
 
-	log.Fatal(e.Start(viper.GetString("server.address")))
+	log.Fatal(e.Start(viper.GetString("server.address"))) //nolint
 }
