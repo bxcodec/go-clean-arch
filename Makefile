@@ -31,8 +31,8 @@ dev-env: ## Bootstrap Environment (with a Docker-Compose help).
 	@ docker-compose up -d --build mysql
 
 dev-env-test: dev-env ## Run application (within a Docker-Compose help)
-	@ $(MAKE) image-lite-build
-	docker-compose up api
+	@ $(MAKE) image-build
+	docker-compose up web
 
 dev-air: $(AIR) ## Starts AIR ( Continuous Development app).
 	air
@@ -60,7 +60,7 @@ build: ## Builds binary
 	@ printf "Building aplication... "
 	@ go build \
 		-trimpath  \
-		-o $@.out \
+		-o engine \
 		./app/
 	@ echo "done"
 
@@ -70,7 +70,7 @@ build-race: ## Builds binary (with -race flag)
 	@ go build \
 		-trimpath  \
 		-race      \
-		-o @.out \
+		-o engine \
 		./app/
 	@ echo "done"
 
@@ -98,10 +98,7 @@ tests: run-tests $(TPARSE) ## Run Tests & parse details
 # ~~~ Docker Build ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .ONESHELL:
-image-build: ## Test Dockerfile (with locally created binary).
-	@ GOOS=linux GOARCH=amd64 \
-		$(MAKE) build
-
+image-build:
 	@ echo "Docker Build"
 	@ DOCKER_BUILDKIT=0 docker build \
 		--file Dockerfile \

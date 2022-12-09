@@ -1,9 +1,7 @@
 version: "3.7"
 services:
   web:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: go-clean-arch
     container_name: article_management_api
     ports:
       - 9090:9090

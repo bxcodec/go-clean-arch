@@ -1,14 +1,14 @@
 # Builder
-FROM golang:1.14.2-alpine3.11 as builder
+FROM golang:1.19.4-alpine3.17 as builder
 
 RUN apk update && apk upgrade && \
-    apk --update add git make
+    apk --update add git make bash build-base
 
 WORKDIR /app
 
 COPY . .
 
-RUN make engine
+RUN make build
 
 # Distribution
 FROM alpine:latest
@@ -21,6 +21,6 @@ WORKDIR /app
 
 EXPOSE 9090
 
-COPY --from=builder /app/engine /app
+COPY --from=builder /app/engine /app/
 
 CMD /app/engine
