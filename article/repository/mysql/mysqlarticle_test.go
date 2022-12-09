@@ -20,11 +20,11 @@ func TestFetch(t *testing.T) {
 	}
 
 	mockArticles := []domain.Article{
-		domain.Article{
+		{
 			ID: 1, Title: "title 1", Content: "content 1",
 			Author: domain.Author{ID: 1}, UpdatedAt: time.Now(), CreatedAt: time.Now(),
 		},
-		domain.Article{
+		{
 			ID: 2, Title: "title 2", Content: "content 2",
 			Author: domain.Author{ID: 1}, UpdatedAt: time.Now(), CreatedAt: time.Now(),
 		},

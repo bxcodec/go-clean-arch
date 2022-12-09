@@ -16,8 +16,8 @@ type mysqlArticleRepository struct {
 }
 
 // NewMysqlArticleRepository will create an object that represent the article.Repository interface
-func NewMysqlArticleRepository(Conn *sql.DB) domain.ArticleRepository {
-	return &mysqlArticleRepository{Conn}
+func NewMysqlArticleRepository(conn *sql.DB) domain.ArticleRepository {
+	return &mysqlArticleRepository{conn}
 }
 
 func (m *mysqlArticleRepository) fetch(ctx context.Context, query string, args ...interface{}) (result []domain.Article, err error) {
@@ -153,7 +153,7 @@ func (m *mysqlArticleRepository) Delete(ctx context.Context, id int64) (err erro
 	}
 
 	if rowsAfected != 1 {
-		err = fmt.Errorf("Weird  Behavior. Total Affected: %d", rowsAfected)
+		err = fmt.Errorf("weird  Behavior. Total Affected: %d", rowsAfected)
 		return
 	}
 
@@ -176,7 +176,7 @@ func (m *mysqlArticleRepository) Update(ctx context.Context, ar *domain.Article)
 		return
 	}
 	if affect != 1 {
-		err = fmt.Errorf("Weird  Behavior. Total Affected: %d", affect)
+		err = fmt.Errorf("weird  Behavior. Total Affected: %d", affect)
 		return
 	}
 
