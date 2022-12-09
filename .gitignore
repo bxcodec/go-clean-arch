@@ -6,3 +6,4 @@ _*
 .DS_Store
 engine
 bin/
+*.out
