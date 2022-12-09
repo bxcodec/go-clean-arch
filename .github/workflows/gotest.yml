@@ -2,7 +2,7 @@ name: Go Test
 
 on:
   push:
-    branches: ["main"]
+    branches: ["main", "chore/upgrade-linter"]
   pull_request:
     branches: ["main"]
 
