@@ -11,7 +11,7 @@ import (
 	"github.com/bxcodec/go-clean-arch/domain"
 )
 
-// ResponseError represent the reseponse error struct
+// ResponseError represent the response error struct
 type ResponseError struct {
 	Message string `json:"message"`
 }
