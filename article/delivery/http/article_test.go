@@ -33,7 +33,7 @@ func TestFetch(t *testing.T) {
 	mockUCase.On("Fetch", mock.Anything, cursor, int64(num)).Return(mockListArticle, "10", nil)
 
 	e := echo.New()
-	req, err := http.NewRequestWithContext(context.TODO(), echo.GET, "/article?num=1&cursor="+cursor, strings.NewReader(""))
+	req, err := http.NewRequestWithContext(context.TODO(), echo.GET, "/articles?num=1&cursor="+cursor, strings.NewReader(""))
 	assert.NoError(t, err)
 
 	rec := httptest.NewRecorder()
@@ -57,7 +57,7 @@ func TestFetchError(t *testing.T) {
 	mockUCase.On("Fetch", mock.Anything, cursor, int64(num)).Return(nil, "", domain.ErrInternalServerError)
 
 	e := echo.New()
-	req, err := http.NewRequestWithContext(context.TODO(), echo.GET, "/article?num=1&cursor="+cursor, strings.NewReader(""))
+	req, err := http.NewRequestWithContext(context.TODO(), echo.GET, "/articles?num=1&cursor="+cursor, strings.NewReader(""))
 	assert.NoError(t, err)
 
 	rec := httptest.NewRecorder()
@@ -86,12 +86,12 @@ func TestGetByID(t *testing.T) {
 	mockUCase.On("GetByID", mock.Anything, int64(num)).Return(mockArticle, nil)
 
 	e := echo.New()
-	req, err := http.NewRequestWithContext(context.TODO(), echo.GET, "/article/"+strconv.Itoa(num), strings.NewReader(""))
+	req, err := http.NewRequestWithContext(context.TODO(), echo.GET, "/articles/"+strconv.Itoa(num), strings.NewReader(""))
 	assert.NoError(t, err)
 
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
-	c.SetPath("article/:id")
+	c.SetPath("articles/:id")
 	c.SetParamNames("id")
 	c.SetParamValues(strconv.Itoa(num))
 	handler := articleHttp.ArticleHandler{
@@ -122,13 +122,13 @@ func TestStore(t *testing.T) {
 	mockUCase.On("Store", mock.Anything, mock.AnythingOfType("*domain.Article")).Return(nil)
 
 	e := echo.New()
-	req, err := http.NewRequestWithContext(context.TODO(), echo.POST, "/article", strings.NewReader(string(j)))
+	req, err := http.NewRequestWithContext(context.TODO(), echo.POST, "/articles", strings.NewReader(string(j)))
 	assert.NoError(t, err)
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
-	c.SetPath("/article")
+	c.SetPath("/articles")
 
 	handler := articleHttp.ArticleHandler{
 		AUsecase: mockUCase,
@@ -152,12 +152,12 @@ func TestDelete(t *testing.T) {
 	mockUCase.On("Delete", mock.Anything, int64(num)).Return(nil)
 
 	e := echo.New()
-	req, err := http.NewRequestWithContext(context.TODO(), echo.DELETE, "/article/"+strconv.Itoa(num), strings.NewReader(""))
+	req, err := http.NewRequestWithContext(context.TODO(), echo.DELETE, "/articles/"+strconv.Itoa(num), strings.NewReader(""))
 	assert.NoError(t, err)
 
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
-	c.SetPath("article/:id")
+	c.SetPath("articles/:id")
 	c.SetParamNames("id")
 	c.SetParamValues(strconv.Itoa(num))
 	handler := articleHttp.ArticleHandler{
