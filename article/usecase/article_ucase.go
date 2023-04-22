@@ -36,7 +36,7 @@ func (a *articleUsecase) fillAuthorDetails(c context.Context, data []domain.Arti
 	// Get the author's id
 	mapAuthors := map[int64]domain.Author{}
 
-	for _, article := range data {
+	for _, article := range data { //nolint
 		mapAuthors[article.Author.ID] = domain.Author{}
 	}
 	// Using goroutine to fetch the author's detail
@@ -73,7 +73,7 @@ func (a *articleUsecase) fillAuthorDetails(c context.Context, data []domain.Arti
 	}
 
 	// merge the author's data
-	for index, item := range data {
+	for index, item := range data { //nolint
 		if a, ok := mapAuthors[item.Author.ID]; ok {
 			data[index].Author = a
 		}
