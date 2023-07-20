@@ -54,12 +54,12 @@ func (a *articleUsecase) fillAuthorDetails(c context.Context, data []domain.Arti
 	}
 
 	go func() {
+		defer close(chanAuthor)
 		err := g.Wait()
 		if err != nil {
 			logrus.Error(err)
 			return
 		}
-		close(chanAuthor)
 	}()
 
 	for author := range chanAuthor {
