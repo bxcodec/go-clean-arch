@@ -12,6 +12,8 @@
       "user": "user",
       "pass": "password",
       "name": "article"
+  },
+  "bcrypt": {
+    "cost": 14
   }
-
 }
