@@ -10,9 +10,12 @@
   Proposed on 2018, archived to v2 branch on 2020 <br>
   Desc: Improvement from v1. The story can be read here: https://medium.com/@imantumorang/trying-clean-architecture-on-golang-2-44d615bf8fdf
 
-- **v3**: master branch <br>
+- **v3**: checkout to the [v3 branch](https://github.com/bxcodec/go-clean-arch/tree/v3) <br>
   Proposed on 2019, merged to master on 2020. <br>
   Desc: Introducing Domain package, the details can be seen on this PR [#21](https://github.com/bxcodec/go-clean-arch/pull/21)
+- **v3**: master branch
+  Proposed on 2024, merged to master on 2024. <br>
+  Desc: Move interfaces near to its implementations.
 
 ## Description
 

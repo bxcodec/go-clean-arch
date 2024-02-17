@@ -8,10 +8,10 @@ import (
 	"github.com/stretchr/testify/assert"
 	sqlmock "gopkg.in/DATA-DOG/go-sqlmock.v1"
 
-	repository "github.com/bxcodec/go-clean-arch/author/repository/mysql"
+	repository "github.com/bxcodec/go-clean-arch/internal/repository/mysql"
 )
 
-func TestGetByID(t *testing.T) {
+func TestGetAuthorByID(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
@@ -26,7 +26,7 @@ func TestGetByID(t *testing.T) {
 	userID := int64(1)
 	prep.ExpectQuery().WithArgs(userID).WillReturnRows(rows)
 
-	a := repository.NewMysqlAuthorRepository(db)
+	a := repository.NewAuthorRepository(db)
 
 	anArticle, err := a.GetByID(context.TODO(), userID)
 	assert.NoError(t, err)

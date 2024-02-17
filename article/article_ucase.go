@@ -10,14 +10,24 @@ import (
 	"github.com/bxcodec/go-clean-arch/domain"
 )
 
+// ArticleRepository represent the article's repository contract
+type ArticleRepository interface {
+	Fetch(ctx context.Context, cursor string, num int64) (res []domain.Article, nextCursor string, err error)
+	GetByID(ctx context.Context, id int64) (domain.Article, error)
+	GetByTitle(ctx context.Context, title string) (domain.Article, error)
+	Update(ctx context.Context, ar *domain.Article) error
+	Store(ctx context.Context, a *domain.Article) error
+	Delete(ctx context.Context, id int64) error
+}
+
 type articleUsecase struct {
-	articleRepo    domain.ArticleRepository
+	articleRepo    ArticleRepository
 	authorRepo     domain.AuthorRepository
 	contextTimeout time.Duration
 }
 
 // NewArticleUsecase will create new an articleUsecase object representation of domain.ArticleUsecase interface
-func NewArticleUsecase(a domain.ArticleRepository, ar domain.AuthorRepository, timeout time.Duration) domain.ArticleUsecase {
+func NewArticleUsecase(a ArticleRepository, ar domain.AuthorRepository, timeout time.Duration) domain.ArticleUsecase {
 	return &articleUsecase{
 		articleRepo:    a,
 		authorRepo:     ar,

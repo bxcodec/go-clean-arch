@@ -1,4 +1,4 @@
-package http_test
+package rest_test
 
 import (
 	"context"
@@ -16,9 +16,9 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
-	articleHttp "github.com/bxcodec/go-clean-arch/article/delivery/http"
 	"github.com/bxcodec/go-clean-arch/domain"
 	"github.com/bxcodec/go-clean-arch/domain/mocks"
+	articleHttp "github.com/bxcodec/go-clean-arch/internal/rest"
 )
 
 func TestFetch(t *testing.T) {
