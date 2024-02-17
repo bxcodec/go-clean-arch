@@ -25,7 +25,7 @@ func TestFetch(t *testing.T) {
 	var mockArticle domain.Article
 	err := faker.FakeData(&mockArticle)
 	assert.NoError(t, err)
-	mockUCase := new(mocks.ArticleUsecase)
+	mockUCase := new(mocks.ArticleService)
 	mockListArticle := make([]domain.Article, 0)
 	mockListArticle = append(mockListArticle, mockArticle)
 	num := 1
@@ -52,7 +52,7 @@ func TestFetch(t *testing.T) {
 }
 
 func TestFetchError(t *testing.T) {
-	mockUCase := new(mocks.ArticleUsecase)
+	mockUCase := new(mocks.ArticleService)
 	num := 1
 	cursor := "2"
 	mockUCase.On("Fetch", mock.Anything, cursor, int64(num)).Return(nil, "", domain.ErrInternalServerError)
@@ -80,7 +80,7 @@ func TestGetByID(t *testing.T) {
 	err := faker.FakeData(&mockArticle)
 	assert.NoError(t, err)
 
-	mockUCase := new(mocks.ArticleUsecase)
+	mockUCase := new(mocks.ArticleService)
 
 	num := int(mockArticle.ID)
 
@@ -115,7 +115,7 @@ func TestStore(t *testing.T) {
 
 	tempMockArticle := mockArticle
 	tempMockArticle.ID = 0
-	mockUCase := new(mocks.ArticleUsecase)
+	mockUCase := new(mocks.ArticleService)
 
 	j, err := json.Marshal(tempMockArticle)
 	assert.NoError(t, err)
@@ -146,7 +146,7 @@ func TestDelete(t *testing.T) {
 	err := faker.FakeData(&mockArticle)
 	assert.NoError(t, err)
 
-	mockUCase := new(mocks.ArticleUsecase)
+	mockUCase := new(mocks.ArticleService)
 
 	num := int(mockArticle.ID)
 

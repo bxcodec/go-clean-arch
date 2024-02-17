@@ -17,10 +17,10 @@ type ResponseError struct {
 	Message string `json:"message"`
 }
 
-// ArticleUsecase represent the article's usecases
+// ArticleService represent the article's usecases
 //
-//go:generate mockery --name ArticleUsecase
-type ArticleUsecase interface {
+//go:generate mockery --name ArticleService
+type ArticleService interface {
 	Fetch(ctx context.Context, cursor string, num int64) ([]domain.Article, string, error)
 	GetByID(ctx context.Context, id int64) (domain.Article, error)
 	Update(ctx context.Context, ar *domain.Article) error
@@ -31,13 +31,13 @@ type ArticleUsecase interface {
 
 // ArticleHandler  represent the httphandler for article
 type ArticleHandler struct {
-	AUsecase ArticleUsecase
+	AUsecase ArticleService
 }
 
 const defaultNum = 10
 
 // NewArticleHandler will initialize the articles/ resources endpoint
-func NewArticleHandler(e *echo.Echo, us ArticleUsecase) {
+func NewArticleHandler(e *echo.Echo, us ArticleService) {
 	handler := &ArticleHandler{
 		AUsecase: us,
 	}
