@@ -16,7 +16,7 @@
 
 - **v4**: master branch
   Proposed on 2024, merged to master on 2024. <br>
-  Desc: Move interfaces near to its user, cleanup the code structure for readable and make it DRY
+  Desc: Move interfaces near to its user, cleanup the code structure for readable and make it DRY. Details can be seen in this PR [#88](https://github.com/bxcodec/go-clean-arch/pull/88)
 
 ## Description
 
