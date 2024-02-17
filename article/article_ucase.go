@@ -34,8 +34,8 @@ type Service struct {
 	authorRepo  AuthorRepository
 }
 
-// NewArticleService will create new an Service object
-func NewArticleService(a ArticleRepository, ar AuthorRepository) *Service {
+// NewService will create a new article service object
+func NewService(a ArticleRepository, ar AuthorRepository) *Service {
 	return &Service{
 		articleRepo: a,
 		authorRepo:  ar,

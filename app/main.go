@@ -77,7 +77,7 @@ func main() {
 	articleRepo := mysqlRepo.NewArticleRepository(dbConn)
 
 	// Build service Layer
-	svc := article.NewArticleService(articleRepo, authorRepo)
+	svc := article.NewService(articleRepo, authorRepo)
 	rest.NewArticleHandler(e, svc)
 
 	// Start Server
