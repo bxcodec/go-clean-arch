@@ -40,7 +40,7 @@ func TestFetch(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 	handler := rest.ArticleHandler{
-		AUsecase: mockUCase,
+		Service: mockUCase,
 	}
 	err = handler.FetchArticle(c)
 	require.NoError(t, err)
@@ -64,7 +64,7 @@ func TestFetchError(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 	handler := rest.ArticleHandler{
-		AUsecase: mockUCase,
+		Service: mockUCase,
 	}
 	err = handler.FetchArticle(c)
 	require.NoError(t, err)
@@ -96,7 +96,7 @@ func TestGetByID(t *testing.T) {
 	c.SetParamNames("id")
 	c.SetParamValues(strconv.Itoa(num))
 	handler := rest.ArticleHandler{
-		AUsecase: mockUCase,
+		Service: mockUCase,
 	}
 	err = handler.GetByID(c)
 	require.NoError(t, err)
@@ -132,7 +132,7 @@ func TestStore(t *testing.T) {
 	c.SetPath("/article")
 
 	handler := rest.ArticleHandler{
-		AUsecase: mockUCase,
+		Service: mockUCase,
 	}
 	err = handler.Store(c)
 	require.NoError(t, err)
@@ -162,7 +162,7 @@ func TestDelete(t *testing.T) {
 	c.SetParamNames("id")
 	c.SetParamValues(strconv.Itoa(num))
 	handler := rest.ArticleHandler{
-		AUsecase: mockUCase,
+		Service: mockUCase,
 	}
 	err = handler.Delete(c)
 	require.NoError(t, err)

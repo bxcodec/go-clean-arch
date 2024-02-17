@@ -31,15 +31,15 @@ type ArticleService interface {
 
 // ArticleHandler  represent the httphandler for article
 type ArticleHandler struct {
-	AUsecase ArticleService
+	Service ArticleService
 }
 
 const defaultNum = 10
 
 // NewArticleHandler will initialize the articles/ resources endpoint
-func NewArticleHandler(e *echo.Echo, us ArticleService) {
+func NewArticleHandler(e *echo.Echo, svc ArticleService) {
 	handler := &ArticleHandler{
-		AUsecase: us,
+		Service: svc,
 	}
 	e.GET("/articles", handler.FetchArticle)
 	e.POST("/articles", handler.Store)
@@ -59,7 +59,7 @@ func (a *ArticleHandler) FetchArticle(c echo.Context) error {
 	cursor := c.QueryParam("cursor")
 	ctx := c.Request().Context()
 
-	listAr, nextCursor, err := a.AUsecase.Fetch(ctx, cursor, int64(num))
+	listAr, nextCursor, err := a.Service.Fetch(ctx, cursor, int64(num))
 	if err != nil {
 		return c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
 	}
@@ -78,7 +78,7 @@ func (a *ArticleHandler) GetByID(c echo.Context) error {
 	id := int64(idP)
 	ctx := c.Request().Context()
 
-	art, err := a.AUsecase.GetByID(ctx, id)
+	art, err := a.Service.GetByID(ctx, id)
 	if err != nil {
 		return c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
 	}
@@ -109,7 +109,7 @@ func (a *ArticleHandler) Store(c echo.Context) (err error) {
 	}
 
 	ctx := c.Request().Context()
-	err = a.AUsecase.Store(ctx, &article)
+	err = a.Service.Store(ctx, &article)
 	if err != nil {
 		return c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
 	}
@@ -127,7 +127,7 @@ func (a *ArticleHandler) Delete(c echo.Context) error {
 	id := int64(idP)
 	ctx := c.Request().Context()
 
-	err = a.AUsecase.Delete(ctx, id)
+	err = a.Service.Delete(ctx, id)
 	if err != nil {
 		return c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
 	}
