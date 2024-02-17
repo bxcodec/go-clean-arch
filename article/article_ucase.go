@@ -11,6 +11,8 @@ import (
 )
 
 // ArticleRepository represent the article's repository contract
+//
+//go:generate mockery --name ArticleRepository
 type ArticleRepository interface {
 	Fetch(ctx context.Context, cursor string, num int64) (res []domain.Article, nextCursor string, err error)
 	GetByID(ctx context.Context, id int64) (domain.Article, error)
@@ -21,6 +23,8 @@ type ArticleRepository interface {
 }
 
 // AuthorRepository represent the author's repository contract
+//
+//go:generate mockery --name AuthorRepository
 type AuthorRepository interface {
 	GetByID(ctx context.Context, id int64) (domain.Author, error)
 }

@@ -17,8 +17,8 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/bxcodec/go-clean-arch/domain"
-	"github.com/bxcodec/go-clean-arch/domain/mocks"
-	articleHttp "github.com/bxcodec/go-clean-arch/internal/rest"
+	"github.com/bxcodec/go-clean-arch/internal/rest"
+	"github.com/bxcodec/go-clean-arch/internal/rest/mocks"
 )
 
 func TestFetch(t *testing.T) {
@@ -39,7 +39,7 @@ func TestFetch(t *testing.T) {
 
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
-	handler := articleHttp.ArticleHandler{
+	handler := rest.ArticleHandler{
 		AUsecase: mockUCase,
 	}
 	err = handler.FetchArticle(c)
@@ -63,7 +63,7 @@ func TestFetchError(t *testing.T) {
 
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
-	handler := articleHttp.ArticleHandler{
+	handler := rest.ArticleHandler{
 		AUsecase: mockUCase,
 	}
 	err = handler.FetchArticle(c)
@@ -95,7 +95,7 @@ func TestGetByID(t *testing.T) {
 	c.SetPath("article/:id")
 	c.SetParamNames("id")
 	c.SetParamValues(strconv.Itoa(num))
-	handler := articleHttp.ArticleHandler{
+	handler := rest.ArticleHandler{
 		AUsecase: mockUCase,
 	}
 	err = handler.GetByID(c)
@@ -131,7 +131,7 @@ func TestStore(t *testing.T) {
 	c := e.NewContext(req, rec)
 	c.SetPath("/article")
 
-	handler := articleHttp.ArticleHandler{
+	handler := rest.ArticleHandler{
 		AUsecase: mockUCase,
 	}
 	err = handler.Store(c)
@@ -161,7 +161,7 @@ func TestDelete(t *testing.T) {
 	c.SetPath("article/:id")
 	c.SetParamNames("id")
 	c.SetParamValues(strconv.Itoa(num))
-	handler := articleHttp.ArticleHandler{
+	handler := rest.ArticleHandler{
 		AUsecase: mockUCase,
 	}
 	err = handler.Delete(c)

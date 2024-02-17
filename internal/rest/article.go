@@ -18,6 +18,8 @@ type ResponseError struct {
 }
 
 // ArticleUsecase represent the article's usecases
+//
+//go:generate mockery --name ArticleUsecase
 type ArticleUsecase interface {
 	Fetch(ctx context.Context, cursor string, num int64) ([]domain.Article, string, error)
 	GetByID(ctx context.Context, id int64) (domain.Article, error)
