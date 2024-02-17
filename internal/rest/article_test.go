@@ -10,8 +10,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/bxcodec/faker"
-	"github.com/labstack/echo"
+	faker "github.com/go-faker/faker/v4"
+	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
@@ -33,7 +33,8 @@ func TestFetch(t *testing.T) {
 	mockUCase.On("Fetch", mock.Anything, cursor, int64(num)).Return(mockListArticle, "10", nil)
 
 	e := echo.New()
-	req, err := http.NewRequestWithContext(context.TODO(), echo.GET, "/article?num=1&cursor="+cursor, strings.NewReader(""))
+	req, err := http.NewRequestWithContext(context.TODO(),
+		echo.GET, "/article?num=1&cursor="+cursor, strings.NewReader(""))
 	assert.NoError(t, err)
 
 	rec := httptest.NewRecorder()

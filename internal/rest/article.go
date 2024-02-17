@@ -1,10 +1,11 @@
 package rest
 
 import (
+	"context"
 	"net/http"
 	"strconv"
 
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 	"github.com/sirupsen/logrus"
 	validator "gopkg.in/go-playground/validator.v9"
 
@@ -16,13 +17,25 @@ type ResponseError struct {
 	Message string `json:"message"`
 }
 
-// ArticleHandler  represent the httphandler for article
-type ArticleHandler struct {
-	AUsecase domain.ArticleUsecase
+// ArticleUsecase represent the article's usecases
+type ArticleUsecase interface {
+	Fetch(ctx context.Context, cursor string, num int64) ([]domain.Article, string, error)
+	GetByID(ctx context.Context, id int64) (domain.Article, error)
+	Update(ctx context.Context, ar *domain.Article) error
+	GetByTitle(ctx context.Context, title string) (domain.Article, error)
+	Store(context.Context, *domain.Article) error
+	Delete(ctx context.Context, id int64) error
 }
 
+// ArticleHandler  represent the httphandler for article
+type ArticleHandler struct {
+	AUsecase ArticleUsecase
+}
+
+const defaultNum = 10
+
 // NewArticleHandler will initialize the articles/ resources endpoint
-func NewArticleHandler(e *echo.Echo, us domain.ArticleUsecase) {
+func NewArticleHandler(e *echo.Echo, us ArticleUsecase) {
 	handler := &ArticleHandler{
 		AUsecase: us,
 	}
@@ -34,8 +47,13 @@ func NewArticleHandler(e *echo.Echo, us domain.ArticleUsecase) {
 
 // FetchArticle will fetch the article based on given params
 func (a *ArticleHandler) FetchArticle(c echo.Context) error {
+
 	numS := c.QueryParam("num")
-	num, _ := strconv.Atoi(numS)
+	num, err := strconv.Atoi(numS)
+	if err != nil || num == 0 {
+		num = defaultNum
+	}
+
 	cursor := c.QueryParam("cursor")
 	ctx := c.Request().Context()
 

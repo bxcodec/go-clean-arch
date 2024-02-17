@@ -13,9 +13,10 @@
 - **v3**: checkout to the [v3 branch](https://github.com/bxcodec/go-clean-arch/tree/v3) <br>
   Proposed on 2019, merged to master on 2020. <br>
   Desc: Introducing Domain package, the details can be seen on this PR [#21](https://github.com/bxcodec/go-clean-arch/pull/21)
-- **v3**: master branch
+
+- **v4**: master branch
   Proposed on 2024, merged to master on 2024. <br>
-  Desc: Move interfaces near to its implementations.
+  Desc: Move interfaces near to its user, cleanup the code structure for readable and make it DRY
 
 ## Description
 
@@ -71,6 +72,9 @@ $ git clone https://github.com/bxcodec/go-clean-arch.git
 
 #move to project
 $ cd go-clean-arch
+
+# copy the example.env to .env
+$ cp example.env .env
 
 # Run the application
 $ make up
