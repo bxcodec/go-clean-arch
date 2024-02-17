@@ -70,12 +70,13 @@ func (a *Service) fillAuthorDetails(ctx context.Context, data []domain.Article) 
 	}
 
 	go func() {
+		defer close(chanAuthor)
 		err := g.Wait()
 		if err != nil {
 			logrus.Error(err)
 			return
 		}
-		close(chanAuthor)
+
 	}()
 
 	for author := range chanAuthor {
