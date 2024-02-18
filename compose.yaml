@@ -12,7 +12,7 @@ services:
       - ./config.json:/app/config.json
 
   mysql:
-    image: mysql:5.7
+    image: mysql:8.3
     container_name: go_clean_arch_mysql
     command: mysqld --user=root
     volumes:

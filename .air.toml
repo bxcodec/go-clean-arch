@@ -16,6 +16,8 @@ full_bin = "./tmp_app/app/engine"
 log = "air_errors.log"
 # Watch these filename extensions.
 include_ext = ["go", "yaml", "toml"]
+# Exclude specific regular expressions.
+exclude_regex = ["_test\\.go"]
 # Ignore these filename extensions or directories.
 exclude_dir = ["tmp_app", "tmp"]
 # It's not necessary to trigger build each time file changes if it's too frequent.

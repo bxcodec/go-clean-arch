@@ -1,4 +1,4 @@
-package usecase
+package article
 
 import (
 	"context"
@@ -10,18 +10,35 @@ import (
 	"github.com/bxcodec/go-clean-arch/domain"
 )
 
-type articleUsecase struct {
-	articleRepo    domain.ArticleRepository
-	authorRepo     domain.AuthorRepository
-	contextTimeout time.Duration
+// ArticleRepository represent the article's repository contract
+//
+//go:generate mockery --name ArticleRepository
+type ArticleRepository interface {
+	Fetch(ctx context.Context, cursor string, num int64) (res []domain.Article, nextCursor string, err error)
+	GetByID(ctx context.Context, id int64) (domain.Article, error)
+	GetByTitle(ctx context.Context, title string) (domain.Article, error)
+	Update(ctx context.Context, ar *domain.Article) error
+	Store(ctx context.Context, a *domain.Article) error
+	Delete(ctx context.Context, id int64) error
 }
 
-// NewArticleUsecase will create new an articleUsecase object representation of domain.ArticleUsecase interface
-func NewArticleUsecase(a domain.ArticleRepository, ar domain.AuthorRepository, timeout time.Duration) domain.ArticleUsecase {
-	return &articleUsecase{
-		articleRepo:    a,
-		authorRepo:     ar,
-		contextTimeout: timeout,
+// AuthorRepository represent the author's repository contract
+//
+//go:generate mockery --name AuthorRepository
+type AuthorRepository interface {
+	GetByID(ctx context.Context, id int64) (domain.Author, error)
+}
+
+type Service struct {
+	articleRepo ArticleRepository
+	authorRepo  AuthorRepository
+}
+
+// NewService will create a new article service object
+func NewService(a ArticleRepository, ar AuthorRepository) *Service {
+	return &Service{
+		articleRepo: a,
+		authorRepo:  ar,
 	}
 }
 
@@ -30,9 +47,8 @@ func NewArticleUsecase(a domain.ArticleRepository, ar domain.AuthorRepository, t
 * Look how this works in this package explanation
 * in godoc: https://godoc.org/golang.org/x/sync/errgroup#ex-Group--Pipeline
  */
-func (a *articleUsecase) fillAuthorDetails(c context.Context, data []domain.Article) ([]domain.Article, error) {
-	g, ctx := errgroup.WithContext(c)
-
+func (a *Service) fillAuthorDetails(ctx context.Context, data []domain.Article) ([]domain.Article, error) {
+	g, ctx := errgroup.WithContext(ctx)
 	// Get the author's id
 	mapAuthors := map[int64]domain.Author{}
 
@@ -54,12 +70,13 @@ func (a *articleUsecase) fillAuthorDetails(c context.Context, data []domain.Arti
 	}
 
 	go func() {
+		defer close(chanAuthor)
 		err := g.Wait()
 		if err != nil {
 			logrus.Error(err)
 			return
 		}
-		close(chanAuthor)
+
 	}()
 
 	for author := range chanAuthor {
@@ -81,14 +98,7 @@ func (a *articleUsecase) fillAuthorDetails(c context.Context, data []domain.Arti
 	return data, nil
 }
 
-func (a *articleUsecase) Fetch(c context.Context, cursor string, num int64) (res []domain.Article, nextCursor string, err error) {
-	if num == 0 {
-		num = 10
-	}
-
-	ctx, cancel := context.WithTimeout(c, a.contextTimeout)
-	defer cancel()
-
+func (a *Service) Fetch(ctx context.Context, cursor string, num int64) (res []domain.Article, nextCursor string, err error) {
 	res, nextCursor, err = a.articleRepo.Fetch(ctx, cursor, num)
 	if err != nil {
 		return nil, "", err
@@ -101,10 +111,7 @@ func (a *articleUsecase) Fetch(c context.Context, cursor string, num int64) (res
 	return
 }
 
-func (a *articleUsecase) GetByID(c context.Context, id int64) (res domain.Article, err error) {
-	ctx, cancel := context.WithTimeout(c, a.contextTimeout)
-	defer cancel()
-
+func (a *Service) GetByID(ctx context.Context, id int64) (res domain.Article, err error) {
 	res, err = a.articleRepo.GetByID(ctx, id)
 	if err != nil {
 		return
@@ -118,17 +125,12 @@ func (a *articleUsecase) GetByID(c context.Context, id int64) (res domain.Articl
 	return
 }
 
-func (a *articleUsecase) Update(c context.Context, ar *domain.Article) (err error) {
-	ctx, cancel := context.WithTimeout(c, a.contextTimeout)
-	defer cancel()
-
+func (a *Service) Update(ctx context.Context, ar *domain.Article) (err error) {
 	ar.UpdatedAt = time.Now()
 	return a.articleRepo.Update(ctx, ar)
 }
 
-func (a *articleUsecase) GetByTitle(c context.Context, title string) (res domain.Article, err error) {
-	ctx, cancel := context.WithTimeout(c, a.contextTimeout)
-	defer cancel()
+func (a *Service) GetByTitle(ctx context.Context, title string) (res domain.Article, err error) {
 	res, err = a.articleRepo.GetByTitle(ctx, title)
 	if err != nil {
 		return
@@ -143,10 +145,8 @@ func (a *articleUsecase) GetByTitle(c context.Context, title string) (res domain
 	return
 }
 
-func (a *articleUsecase) Store(c context.Context, m *domain.Article) (err error) {
-	ctx, cancel := context.WithTimeout(c, a.contextTimeout)
-	defer cancel()
-	existedArticle, _ := a.GetByTitle(ctx, m.Title)
+func (a *Service) Store(ctx context.Context, m *domain.Article) (err error) {
+	existedArticle, _ := a.GetByTitle(ctx, m.Title) // ignore if any error
 	if existedArticle != (domain.Article{}) {
 		return domain.ErrConflict
 	}
@@ -155,9 +155,7 @@ func (a *articleUsecase) Store(c context.Context, m *domain.Article) (err error)
 	return
 }
 
-func (a *articleUsecase) Delete(c context.Context, id int64) (err error) {
-	ctx, cancel := context.WithTimeout(c, a.contextTimeout)
-	defer cancel()
+func (a *Service) Delete(ctx context.Context, id int64) (err error) {
 	existedArticle, err := a.articleRepo.GetByID(ctx, id)
 	if err != nil {
 		return

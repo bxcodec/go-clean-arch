@@ -5,68 +5,85 @@ import (
 	"fmt"
 	"log"
 	"net/url"
+	"os"
+	"strconv"
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/labstack/echo"
-	"github.com/spf13/viper"
+	"github.com/labstack/echo/v4"
 
-	_articleHttpDelivery "github.com/bxcodec/go-clean-arch/article/delivery/http"
-	_articleHttpDeliveryMiddleware "github.com/bxcodec/go-clean-arch/article/delivery/http/middleware"
-	_articleRepo "github.com/bxcodec/go-clean-arch/article/repository/mysql"
-	_articleUcase "github.com/bxcodec/go-clean-arch/article/usecase"
-	_authorRepo "github.com/bxcodec/go-clean-arch/author/repository/mysql"
+	mysqlRepo "github.com/bxcodec/go-clean-arch/internal/repository/mysql"
+
+	"github.com/bxcodec/go-clean-arch/article"
+	"github.com/bxcodec/go-clean-arch/internal/rest"
+	"github.com/bxcodec/go-clean-arch/internal/rest/middleware"
+	"github.com/joho/godotenv"
+)
+
+const (
+	defaultTimeout = 30
+	defaultAddress = ":9090"
 )
 
 func init() {
-	viper.SetConfigFile(`config.json`)
-	err := viper.ReadInConfig()
+	err := godotenv.Load()
 	if err != nil {
-		panic(err)
-	}
-
-	if viper.GetBool(`debug`) {
-		log.Println("Service RUN on DEBUG mode")
+		log.Fatal("Error loading .env file")
 	}
 }
 
 func main() {
-	dbHost := viper.GetString(`database.host`)
-	dbPort := viper.GetString(`database.port`)
-	dbUser := viper.GetString(`database.user`)
-	dbPass := viper.GetString(`database.pass`)
-	dbName := viper.GetString(`database.name`)
+	//prepare database
+	dbHost := os.Getenv("DATABASE_HOST")
+	dbPort := os.Getenv("DATABASE_PORT")
+	dbUser := os.Getenv("DATABASE_USER")
+	dbPass := os.Getenv("DATABASE_PASS")
+	dbName := os.Getenv("DATABASE_NAME")
 	connection := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", dbUser, dbPass, dbHost, dbPort, dbName)
 	val := url.Values{}
 	val.Add("parseTime", "1")
 	val.Add("loc", "Asia/Jakarta")
 	dsn := fmt.Sprintf("%s?%s", connection, val.Encode())
 	dbConn, err := sql.Open(`mysql`, dsn)
-
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("failed to open connection to database", err)
 	}
 	err = dbConn.Ping()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("failed to ping database ", err)
 	}
 
 	defer func() {
 		err := dbConn.Close()
 		if err != nil {
-			log.Fatal(err)
+			log.Fatal("got error when closing the DB connection", err)
 		}
 	}()
+	// prepare echo
 
 	e := echo.New()
-	middL := _articleHttpDeliveryMiddleware.InitMiddleware()
-	e.Use(middL.CORS)
-	authorRepo := _authorRepo.NewMysqlAuthorRepository(dbConn)
-	ar := _articleRepo.NewMysqlArticleRepository(dbConn)
+	e.Use(middleware.CORS)
+	timeoutStr := os.Getenv("CONTEXT_TIMEOUT")
+	timeout, err := strconv.Atoi(timeoutStr)
+	if err != nil {
+		log.Println("failed to parse timeout, using default timeout")
+		timeout = defaultTimeout
+	}
+	timeoutContext := time.Duration(timeout) * time.Second
+	e.Use(middleware.SetRequestContextWithTimeout(timeoutContext))
 
-	timeoutContext := time.Duration(viper.GetInt("context.timeout")) * time.Second
-	au := _articleUcase.NewArticleUsecase(ar, authorRepo, timeoutContext)
-	_articleHttpDelivery.NewArticleHandler(e, au)
+	// Prepare Repository
+	authorRepo := mysqlRepo.NewAuthorRepository(dbConn)
+	articleRepo := mysqlRepo.NewArticleRepository(dbConn)
 
-	log.Fatal(e.Start(viper.GetString("server.address"))) //nolint
+	// Build service Layer
+	svc := article.NewService(articleRepo, authorRepo)
+	rest.NewArticleHandler(e, svc)
+
+	// Start Server
+	addres := os.Getenv("SERVER_ADDRESS")
+	if addres == "" {
+		addres = defaultAddress
+	}
+	log.Fatal(e.Start(os.Getenv("SERVER_ADDRESS"))) //nolint
 }
