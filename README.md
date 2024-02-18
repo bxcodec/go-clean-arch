@@ -23,7 +23,10 @@
   - Introduce `Service-focused` package.
 
   Details can be seen in this PR [#88](https://github.com/bxcodec/go-clean-arch/pull/88).<br>
-  You may notice it diverges from the structures seen in previous versions. I encourage you to explore the branches for each version to select the structure that appeals to you the most. In my recent projects, the code structure has progressed to version 4. However, I do not strictly advocate for one version over another. You may encounter alternative examples on the internet that align more closely with your preferences. Rest assured, the foundational concept will remain consistent or at least bear resemblance. The differences are primarily in the arrangement of directories or the integration of advanced tools directly into the setup.
+
+> ### Author's Note
+>
+> You may notice it diverges from the structures seen in previous versions. I encourage you to explore the branches for each version to select the structure that appeals to you the most. In my recent projects, the code structure has progressed to version 4. However, I do not strictly advocate for one version over another. You may encounter alternative examples on the internet that align more closely with your preferences. Rest assured, the foundational concept will remain consistent or at least bear resemblance. The differences are primarily in the arrangement of directories or the integration of advanced tools directly into the setup.
 
 ## Description
 
