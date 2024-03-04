@@ -81,9 +81,9 @@ func main() {
 	rest.NewArticleHandler(e, svc)
 
 	// Start Server
-	addres := os.Getenv("SERVER_ADDRESS")
-	if addres == "" {
-		addres = defaultAddress
+	address := os.Getenv("SERVER_ADDRESS")
+	if address == "" {
+		address = defaultAddress
 	}
 	log.Fatal(e.Start(os.Getenv("SERVER_ADDRESS"))) //nolint
 }
