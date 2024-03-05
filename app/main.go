@@ -85,5 +85,5 @@ func main() {
 	if address == "" {
 		address = defaultAddress
 	}
-	log.Fatal(e.Start(os.Getenv("SERVER_ADDRESS"))) //nolint
+	log.Fatal(e.Start(address)) //nolint
 }
